@@ -24,9 +24,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			ExecuteIterations(container);
 			Report(container);
 
-			AlgorithmPackingResult result = new AlgorithmPackingResult();
-			result.AlgorithmID = (int)AlgorithmType.EB_AFIT;
-			result.AlgorithmName = "EB-AFIT";
+			var algoResult = new AlgorithmPackingResult();
+			algoResult.AlgorithmID = (int)AlgorithmType.EB_AFIT;
+			algoResult.AlgorithmName = "EB-AFIT";
 
 			for (int i = 1; i <= itemsToPackCount; i++)
 			{
@@ -34,20 +34,20 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 				if (!itemsToPack[i].IsPacked)
 				{
-					result.UnpackedItems.Add(itemsToPack[i]);
+					algoResult.UnpackedItems.Add(itemsToPack[i]);
 				}
 			}
 
-			result.PackedItems = itemsPackedInOrder;
+			algoResult.PackedItems = itemsPackedInOrder;
 			
 
 
-			if (result.UnpackedItems.Count == 0)
+			if (algoResult.UnpackedItems.Count == 0)
 			{
-				result.IsCompletePack = true;
+				algoResult.IsCompletePack = true;
 			}
 
-			return result;
+			return algoResult;
 		}
 
 
@@ -61,15 +61,14 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		private ScrapPad trash;
 
 		private bool evened;
-		private bool hundredPercentPacked = false;
+		private bool hundredPercentPacked;
 		private bool layerDone;
 		private bool packing;
-		private bool packingBest = false;
-		private bool quit = false;
+		private bool packingBest;
+		private bool quit;
 
 		private int bboxi;
 		private int bestIteration;
-		private int bestVariant;
 		private int boxi;
 		private int cboxi;
 		private int layerListLen;
@@ -279,34 +278,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			int layersIndex;
 			decimal bestVolume = 0.0M;
 
-			for (int containerOrientationVariant = 1; (containerOrientationVariant <= 6) && !quit; containerOrientationVariant++)
-			{
-				switch (containerOrientationVariant)
-				{
-					case 1:
-						px = container.Length; py = container.Height; pz = container.Width;
-						break;
-
-					case 2:
-						px = container.Width; py = container.Height; pz = container.Length;
-						break;
-
-					case 3:
-						px = container.Width; py = container.Length; pz = container.Height;
-						break;
-
-					case 4:
-						px = container.Height; py = container.Length; pz = container.Width;
-						break;
-
-					case 5:
-						px = container.Length; py = container.Width; pz = container.Height;
-						break;
-
-					case 6:
-						px = container.Height; py = container.Width; pz = container.Length;
-						break;
-				}
+			px = container.Length;
+			py = container.Height;
+			pz = container.Width;
 
 				layers.Add(new Layer { LayerEval = -1 });
 				ListCanditLayers();
@@ -335,7 +309,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 						PackLayer();
 
-						packedy = packedy + layerThickness;
+						packedy += layerThickness;
 						remainpy = py - packedy;
 
 						if (layerinlayer != 0 && !quit)
@@ -361,19 +335,13 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					if ((packedVolume > bestVolume) && !quit)
 					{
 						bestVolume = packedVolume;
-						bestVariant = containerOrientationVariant;
 						bestIteration = itelayer;
 					}
 
 					if (hundredPercentPacked) break;
 				}
 
-				if (hundredPercentPacked) break;
-
-				if ((container.Length == container.Height) && (container.Height == container.Width)) containerOrientationVariant = 6;
-
 				layers = new List<Layer>();
-			}
 		}
 
 		/// <summary>
@@ -392,7 +360,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			boxi = 0;
 			bboxi = 0;
 
-			for (y = 1; y <= itemsToPackCount; y = y + itemsToPack[y].Quantity)
+			for (y = 1; y <= itemsToPackCount; y += itemsToPack[y].Quantity)
 			{
 				for (x = y; x < x + itemsToPack[y].Quantity - 1; x++)
 				{
@@ -478,7 +446,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 									dimdif = Math.Abs(exdim - itemsToPack[z].Dim3);
 								}
 
-								layereval = layereval + dimdif;
+								layereval += dimdif;
 							}
 						}
 
@@ -547,7 +515,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			for (x = 1; x <= itemsToPackCount; x++)
 			{
-				totalItemVolume = totalItemVolume + itemsToPack[x].Volume;
+				totalItemVolume += itemsToPack[x].Volume;
 			}
 
 			scrapfirst = new ScrapPad();
@@ -632,7 +600,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 							{
 								dimdif = Math.Abs(exdim - itemsToPack[z].Dim3);
 							}
-							layereval = layereval + dimdif;
+							layereval += dimdif;
 						}
 					}
 
@@ -658,62 +626,12 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
             decimal packDimY = 0;
             decimal packDimZ = 0;
 
-			switch (bestVariant)
-			{
-				case 1:
-					packCoordX = itemsToPack[cboxi].CoordX;
-					packCoordY = itemsToPack[cboxi].CoordY;
-					packCoordZ = itemsToPack[cboxi].CoordZ;
-					packDimX = itemsToPack[cboxi].PackDimX;
-					packDimY = itemsToPack[cboxi].PackDimY;
-					packDimZ = itemsToPack[cboxi].PackDimZ;
-					break;
-
-				case 2:
-					packCoordX = itemsToPack[cboxi].CoordZ;
-					packCoordY = itemsToPack[cboxi].CoordY;
-					packCoordZ = itemsToPack[cboxi].CoordX;
-					packDimX = itemsToPack[cboxi].PackDimZ;
-					packDimY = itemsToPack[cboxi].PackDimY;
-					packDimZ = itemsToPack[cboxi].PackDimX;
-					break;
-
-				case 3:
-					packCoordX = itemsToPack[cboxi].CoordY;
-					packCoordY = itemsToPack[cboxi].CoordZ;
-					packCoordZ = itemsToPack[cboxi].CoordX;
-					packDimX = itemsToPack[cboxi].PackDimY;
-					packDimY = itemsToPack[cboxi].PackDimZ;
-					packDimZ = itemsToPack[cboxi].PackDimX;
-					break;
-
-				case 4:
-					packCoordX = itemsToPack[cboxi].CoordY;
-					packCoordY = itemsToPack[cboxi].CoordX;
-					packCoordZ = itemsToPack[cboxi].CoordZ;
-					packDimX = itemsToPack[cboxi].PackDimY;
-					packDimY = itemsToPack[cboxi].PackDimX;
-					packDimZ = itemsToPack[cboxi].PackDimZ;
-					break;
-
-				case 5:
-					packCoordX = itemsToPack[cboxi].CoordX;
-					packCoordY = itemsToPack[cboxi].CoordZ;
-					packCoordZ = itemsToPack[cboxi].CoordY;
-					packDimX = itemsToPack[cboxi].PackDimX;
-					packDimY = itemsToPack[cboxi].PackDimZ;
-					packDimZ = itemsToPack[cboxi].PackDimY;
-					break;
-
-				case 6:
-					packCoordX = itemsToPack[cboxi].CoordZ;
-					packCoordY = itemsToPack[cboxi].CoordX;
-					packCoordZ = itemsToPack[cboxi].CoordY;
-					packDimX = itemsToPack[cboxi].PackDimZ;
-					packDimY = itemsToPack[cboxi].PackDimX;
-					packDimZ = itemsToPack[cboxi].PackDimY;
-					break;
-			}
+            packCoordX = itemsToPack[cboxi].CoordX;
+            packCoordY = itemsToPack[cboxi].CoordY;
+            packCoordZ = itemsToPack[cboxi].CoordZ;
+            packDimX = itemsToPack[cboxi].PackDimX;
+            packDimY = itemsToPack[cboxi].PackDimY;
+            packDimZ = itemsToPack[cboxi].PackDimZ;
 
 			itemsToPack[cboxi].CoordX = packCoordX;
 			itemsToPack[cboxi].CoordY = packCoordY;
@@ -764,7 +682,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					itemsToPack[cboxi].CoordZ = smallestZ.CumZ;
 					if (cboxx == smallestZ.CumX)
 					{
-						smallestZ.CumZ = smallestZ.CumZ + cboxz;
+						smallestZ.CumZ += cboxz;
 					}
 					else
 					{
@@ -775,7 +693,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						smallestZ.Post.CumX = smallestZ.CumX;
 						smallestZ.Post.CumZ = smallestZ.CumZ;
 						smallestZ.CumX = cboxx;
-						smallestZ.CumZ = smallestZ.CumZ + cboxz;
+						smallestZ.CumZ += cboxz;
 					}
 				}
 				else if (smallestZ.Pre == null)
@@ -811,7 +729,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						}
 						else
 						{
-							smallestZ.CumZ = smallestZ.CumZ + cboxz;
+							smallestZ.CumZ += cboxz;
 						}
 					}
 					else
@@ -820,7 +738,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 						if (smallestZ.CumZ + cboxz == smallestZ.Post.CumZ)
 						{
-							smallestZ.CumX = smallestZ.CumX - cboxx;
+							smallestZ.CumX -= cboxx;
 						}
 						else
 						{
@@ -830,7 +748,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 							smallestZ.Post.Pre.Pre = smallestZ;
 							smallestZ.Post = smallestZ.Post.Pre;
 							smallestZ.Post.CumX = smallestZ.CumX;
-							smallestZ.CumX = smallestZ.CumX - cboxx;
+							smallestZ.CumX -= cboxx;
 							smallestZ.Post.CumZ = smallestZ.CumZ + cboxz;
 						}
 					}
@@ -861,14 +779,14 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						}
 						else
 						{
-							smallestZ.CumZ = smallestZ.CumZ + cboxz;
+							smallestZ.CumZ += cboxz;
 						}
 					}
 					else
 					{
 						if (smallestZ.CumZ + cboxz == smallestZ.Pre.CumZ)
 						{
-							smallestZ.Pre.CumX = smallestZ.Pre.CumX + cboxx;
+							smallestZ.Pre.CumX += cboxx;
 						}
 						else
 						{
@@ -921,14 +839,14 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						}
 						else
 						{
-							smallestZ.CumZ = smallestZ.CumZ + cboxz;
+							smallestZ.CumZ += cboxz;
 						}
 					}
 					else if (smallestZ.Pre.CumX < px - smallestZ.CumX)
 					{
 						if (smallestZ.CumZ + cboxz == smallestZ.Pre.CumZ)
 						{
-							smallestZ.CumX = smallestZ.CumX - cboxx;
+							smallestZ.CumX -= cboxx;
 							itemsToPack[cboxi].CoordX = smallestZ.CumX;
 						}
 						else
@@ -947,7 +865,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					{
 						if (smallestZ.CumZ + cboxz == smallestZ.Pre.CumZ)
 						{
-							smallestZ.Pre.CumX = smallestZ.Pre.CumX + cboxx;
+							smallestZ.Pre.CumX += cboxx;
 							itemsToPack[cboxi].CoordX = smallestZ.Pre.CumX;
 						}
 						else
@@ -960,7 +878,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 							smallestZ.Post = smallestZ.Post.Pre;
 							smallestZ.Post.CumX = smallestZ.CumX;
 							smallestZ.Post.CumZ = smallestZ.CumZ + cboxz;
-							smallestZ.CumX = smallestZ.CumX - cboxx;
+							smallestZ.CumX -= cboxx;
 						}
 					}
 				}
@@ -991,19 +909,19 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						}
 						else
 						{
-							smallestZ.CumZ = smallestZ.CumZ + cboxz;
+							smallestZ.CumZ += cboxz;
 						}
 					}
 					else
 					{
 						if ((smallestZ.CumZ + cboxz) == smallestZ.Pre.CumZ)
 						{
-							smallestZ.Pre.CumX = smallestZ.Pre.CumX + cboxx;
+							smallestZ.Pre.CumX += cboxx;
 						}
 						else if (smallestZ.CumZ + cboxz == smallestZ.Post.CumZ)
 						{
 							itemsToPack[cboxi].CoordX = smallestZ.CumX - cboxx;
-							smallestZ.CumX = smallestZ.CumX - cboxx;
+							smallestZ.CumX -= cboxx;
 						}
 						else
 						{
@@ -1030,32 +948,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		{
 			quit = false;
 
-			switch (bestVariant)
-			{
-				case 1:
-					px = container.Length; py = container.Height; pz = container.Width;
-					break;
-
-				case 2:
-					px = container.Width; py = container.Height; pz = container.Length;
-					break;
-
-				case 3:
-					px = container.Width; py = container.Length; pz = container.Height;
-					break;
-
-				case 4:
-					px = container.Height; py = container.Length; pz = container.Width;
-					break;
-
-				case 5:
-					px = container.Length; py = container.Width; pz = container.Height;
-					break;
-
-				case 6:
-					px = container.Height; py = container.Width; pz = container.Length;
-					break;
-			}
+			px = container.Length;
+			py = container.Height;
+			pz = container.Width;
 
 			packingBest = true;
 
@@ -1085,7 +980,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				layerinlayer = 0;
 				layerDone = false;
 				PackLayer();
-				packedy = packedy + layerThickness;
+				packedy += layerThickness;
 				remainpy = py - packedy;
 
 				if (layerinlayer > 0.0001M)
@@ -1119,7 +1014,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			itemsToPack[cboxi].PackDimX = cboxx;
 			itemsToPack[cboxi].PackDimY = cboxy;
 			itemsToPack[cboxi].PackDimZ = cboxz;
-			packedVolume = packedVolume + itemsToPack[cboxi].Volume;
+			packedVolume += itemsToPack[cboxi].Volume;
 			packedItemCount++;
 
 			if (packingBest)
