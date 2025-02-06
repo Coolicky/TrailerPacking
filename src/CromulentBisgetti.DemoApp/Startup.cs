@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace CromulentBisgetti.DemoApp
 {
@@ -18,6 +19,9 @@ namespace CromulentBisgetti.DemoApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .CreateLogger();
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -25,7 +29,7 @@ namespace CromulentBisgetti.DemoApp
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            services.AddSerilog();
             services.AddMvc(option => option.EnableEndpointRouting = false)
                 .AddJsonOptions(options =>
                 {

@@ -11,13 +11,7 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 	/// </summary>
 	public class Container
 	{
-		#region Private Variables
-
 		private decimal volume;
-
-		#endregion Private Variables
-
-		#region Constructors
 
 		/// <summary>
 		/// Initializes a new instance of the Container class.
@@ -28,16 +22,13 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 		/// <param name="height">The container height.</param>
 		public Container(int id, decimal length, decimal width, decimal height)
 		{
-			this.ID = id;
-			this.Length = length;
-			this.Width = width;
-			this.Height = height;
-			this.Volume = length * width * height;
+			ID = id;
+			Length = length;
+			Width = width;
+			Height = height;
+			Volume = length * width * height;
 		}
 
-		#endregion Constructors
-
-		#region Public Properties
 		/// <summary>
 		/// Gets or sets the container ID.
 		/// </summary>
@@ -78,16 +69,8 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 		/// </value>
 		public decimal Volume
 		{
-			get
-			{
-				return this.volume;
-			}
-			set
-			{
-				this.volume = value;
-			}
+			get => volume;
+			set => volume = value;
 		}
-
-		#endregion Public Properties
 	}
 }

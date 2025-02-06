@@ -8,13 +8,7 @@ namespace CromulentBisgetti.ContainerPacking.Entities
     [DataContract]
 	public class Item
 	{
-		#region Private Variables
-
 		private decimal volume;
-
-		#endregion Private Variables
-
-		#region Constructors
 
 		/// <summary>
 		/// Initializes a new instance of the Item class.
@@ -33,10 +27,6 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 			this.volume = dim1 * dim2 * dim3;
 			this.Quantity = quantity;
 		}
-
-		#endregion Constructors
-
-		#region Public Properties
 
 		/// <summary>
 		/// Gets or sets the item ID.
@@ -152,14 +142,6 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 		/// The item volume.
 		/// </value>
 		[DataMember]
-		public decimal Volume 
-		{
-			get
-			{
-				return volume;
-			}
-		}
-
-		#endregion Public Properties
+		public decimal Volume => volume;
 	}
 }
