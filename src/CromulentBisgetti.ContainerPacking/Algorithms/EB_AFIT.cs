@@ -12,8 +12,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 	/// </summary>
 	public class EB_AFIT : IPackingAlgorithm
 	{
-		#region Public Methods
-
 		/// <summary>
 		/// Runs the packing algorithm.
 		/// </summary>
@@ -52,9 +50,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			return result;
 		}
 
-		#endregion Public Methods
-
-		#region Private Variables
 
 		private List<Item> itemsToPack;
 		private List<Item> itemsPackedInOrder;
@@ -112,10 +107,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		private decimal itemsToPackCount;
 		private decimal totalItemVolume;
 		private decimal totalContainerVolume;
-
-		#endregion Private Variables
-
-		#region Private Methods
 
 		/// <summary>
 		/// Analyzes each unpacked box to find the best fitting one to the empty space given.
@@ -1142,10 +1133,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			}
 		}
 
-		#endregion Private Methods
-
-		#region Private Classes
-
 		/// <summary>
 		/// A list that stores all the different lengths of all item dimensions.
 		/// From the master's thesis:
@@ -1216,7 +1203,5 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			/// </value>
 			public ScrapPad Pre { get; set; }
 		}
-
-		#endregion Private Classes
 	}
 }
