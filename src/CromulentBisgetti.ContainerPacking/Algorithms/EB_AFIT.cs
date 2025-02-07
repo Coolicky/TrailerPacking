@@ -67,13 +67,16 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		private bool useBestPacking;
 		private bool abortPacking;
 
-		private int bestBoxIndex;
 		private int bestIteration;
+		// private int bestBoxIndex;
+		private Item bestBox;
+		private int currentItemIndex;
+		private Item currentBox;
 		private int currentBoxIndex;
+		private Item candidateBox;
 		private int candidateBoxIndex;
 		private int layerCount;
 		private int packedItemCount;
-		private int currentItemIndex;
 
 		private decimal bestBoxFitRemainingX;
 		private decimal bestBoxFitRemainingY;
@@ -134,6 +137,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestFitRemainingX = maxWidthAvailable - itemWidth;
 						bestFitRemainingY = currentHeight - itemHeight;
 						bestFitRemainingZ = Math.Abs(currentDepth - itemDepth);
+						currentBox = itemsToPack[currentItemIndex];
 						currentBoxIndex = currentItemIndex;
 					}
 					else if (currentHeight - itemHeight == bestFitRemainingY && maxWidthAvailable - itemWidth < bestFitRemainingX)
@@ -144,6 +148,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestFitRemainingX = maxWidthAvailable - itemWidth;
 						bestFitRemainingY = currentHeight - itemHeight;
 						bestFitRemainingZ = Math.Abs(currentDepth - itemDepth);
+						currentBox = itemsToPack[currentItemIndex];
 						currentBoxIndex = currentItemIndex;
 					}
 					else if (currentHeight - itemHeight == bestFitRemainingY && maxWidthAvailable - itemWidth == bestFitRemainingX && Math.Abs(currentDepth - itemDepth) < bestFitRemainingZ)
@@ -154,6 +159,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestFitRemainingX = maxWidthAvailable - itemWidth;
 						bestFitRemainingY = currentHeight - itemHeight;
 						bestFitRemainingZ = Math.Abs(currentDepth - itemDepth);
+						currentBox = itemsToPack[currentItemIndex];
 						currentBoxIndex = currentItemIndex;
 					}
 				}
@@ -167,7 +173,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestBoxFitRemainingX = maxWidthAvailable - itemWidth;
 						bestBoxFitRemainingY = itemHeight - currentHeight;
 						bestBoxFitRemainingZ = Math.Abs(currentDepth - itemDepth);
-						bestBoxIndex = currentItemIndex;
+						bestBox = itemsToPack[currentItemIndex];
 					}
 					else if (itemHeight - currentHeight == bestBoxFitRemainingY && maxWidthAvailable - itemWidth < bestBoxFitRemainingX)
 					{
@@ -177,7 +183,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestBoxFitRemainingX = maxWidthAvailable - itemWidth;
 						bestBoxFitRemainingY = itemHeight - currentHeight;
 						bestBoxFitRemainingZ = Math.Abs(currentDepth - itemDepth);
-						bestBoxIndex = currentItemIndex;
+						bestBox = itemsToPack[currentItemIndex];
 					}
 					else if (itemHeight - currentHeight == bestBoxFitRemainingY && maxWidthAvailable - itemWidth == bestBoxFitRemainingX && Math.Abs(currentDepth - itemDepth) < bestBoxFitRemainingZ)
 					{
@@ -187,7 +193,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestBoxFitRemainingX = maxWidthAvailable - itemWidth;
 						bestBoxFitRemainingY = itemHeight - currentHeight;
 						bestBoxFitRemainingZ = Math.Abs(currentDepth - itemDepth);
-						bestBoxIndex = currentItemIndex;
+						bestBox = itemsToPack[currentItemIndex];
 					}
 				}
 			}
@@ -202,6 +208,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			if (currentBoxIndex != 0)
 			{
+				candidateBox = currentBox;
 				candidateBoxIndex = currentBoxIndex;
 				candidateBoxWidth = currentBoxWidth;
 				candidateBoxHeight = currentBoxHeight;
@@ -209,7 +216,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			}
 			else
 			{
-				if (bestBoxIndex > 0 && (nestedLayerHeight != 0 || smallestZGap.Pre == null && smallestZGap.Post == null))
+				if (bestBox != null && (nestedLayerHeight != 0 || smallestZGap.Pre == null && smallestZGap.Post == null))
 				{
 					if (nestedLayerHeight == 0)
 					{
@@ -217,7 +224,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						nestedLayerDepth = smallestZGap.CumZ;
 					}
 
-					candidateBoxIndex = bestBoxIndex;
+					candidateBox = bestBox;
 					candidateBoxWidth = bestBoxFitX;
 					candidateBoxHeight = bestBoxFitY;
 					candidateBoxDepth = bestBoxFitZ;
@@ -369,8 +376,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			bestBoxFitRemainingX = 32767;
 			bestBoxFitRemainingY = 32767;
 			bestBoxFitRemainingZ = 32767;
+			currentBox = null;
 			currentBoxIndex = 0;
-			bestBoxIndex = 0;
+			bestBox = null;
 
 			for (y = 1; y <= itemsToPackCount; y += itemsToPack[y].Quantity)
 			{
@@ -401,7 +409,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim3, itemsToPack[currentItemIndex].Dim1, itemsToPack[currentItemIndex].Dim2);
 				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim3, itemsToPack[currentItemIndex].Dim2, itemsToPack[currentItemIndex].Dim1);
 			}
-			Log.Information($"BestBox-> {itemsToPack[bestBoxIndex].Dim1}|{itemsToPack[bestBoxIndex].Dim2}|{itemsToPack[bestBoxIndex].Dim3}");
+			Log.Information($"BestBox-> {bestBox?.Dim1}|{bestBox?.Dim2}|{bestBox?.Dim3}");
 			Log.Information($"Layer-> {currentLayerThickness}");
 		}
 		private bool IsOverlapping()
@@ -962,11 +970,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			containerWidth = container.Width;
 
 			useBestPacking = true;
-
-			//Print("BEST SOLUTION FOUND AT ITERATION                      :", bestIteration, "OF VARIANT", bestVariant);
-			//Print("TOTAL ITEMS TO PACK                                   :", itemsToPackCount);
-			//Print("TOTAL VOLUME OF ALL ITEMS                             :", totalItemVolume);
-			//Print("WHILE CONTAINER ORIENTATION X - Y - Z                 :", px, py, pz);
 
 			layers.Clear();
 			layers.Add(new Layer { LayerEval = -1 });
