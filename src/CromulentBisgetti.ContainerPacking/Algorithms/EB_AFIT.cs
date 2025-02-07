@@ -377,18 +377,20 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			currentBox = null;
 			bestBox = null;
 
-			for (y = 1; y <= itemsToPackCount; y += itemsToPack[y].Quantity)
+			foreach (var item in itemsToPack)
 			{
-				for (currentItemIndex = y; currentItemIndex < currentItemIndex + itemsToPack[y].Quantity - 1; currentItemIndex++)
+				if (item == null || item.Quantity == 0) continue;
+
+				foreach (var subItem in itemsToPack.SkipWhile(r => r != item).Take(item.Quantity))
 				{
-					if (!itemsToPack[currentItemIndex].IsPacked) break;
+					if (!subItem.IsPacked) currentItemIndex = itemsToPack.IndexOf(subItem);
 				}
 
 				if (itemsToPack[currentItemIndex].IsPacked) continue;
 
 				if (currentItemIndex > itemsToPackCount) return;
 
-				if (IsOverlapping())
+				if (IsOverlapping(itemsToPack[currentItemIndex]))
 				{
 					continue;
 				} 
@@ -409,16 +411,16 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			Log.Information($"BestBox-> {bestBox?.Dim1}|{bestBox?.Dim2}|{bestBox?.Dim3}");
 			Log.Information($"Layer-> {currentLayerThickness}");
 		}
-		private bool IsOverlapping()
+		private bool IsOverlapping(Item item)
 		{
 
-			var xStart = itemsToPack[currentItemIndex].CoordX;
-			var zStart = itemsToPack[currentItemIndex].CoordZ;
-			var xEnd = xStart + itemsToPack[currentItemIndex].Dim1;
-			var zEnd = zStart + itemsToPack[currentItemIndex].Dim3;
+			var xStart = item.CoordX;
+			var zStart = item.CoordZ;
+			var xEnd = xStart + item.Dim1;
+			var zEnd = zStart + item.Dim3;
 
 			var isOverlapping = blockedRegions.Any(r =>
-				// packedHeight >= r.MinYLevel &&
+				packedHeight >= r.MinYLevel &&
 				xStart < r.XEnd &&
 				xEnd > r.XStart &&
 				zStart < r.ZEnd &&
@@ -444,7 +446,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			foreach (var item in itemsToPack.Where(item => !item.IsPacked))
 			{
-				currentItemIndex = itemsToPack.IndexOf(item);
 				for (y = 1; y <= 3; y++)
 				{
 					switch (y)
@@ -497,7 +498,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					
 					for (z = 1; z <= itemsToPackCount; z++)
 					{
-						if (currentItemIndex == z || itemsToPack[z].IsPacked)
+						if (itemsToPack.IndexOf(item) == z || itemsToPack[z].IsPacked)
 							continue;
 						
 						dimdif = Math.Abs(exdim - itemsToPack[z].Dim1);
@@ -577,9 +578,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			totalContainerVolume = container.Length * container.Height * container.Width;
 			totalItemVolume = 0.0M;
 
-			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
+			foreach (var item in itemsToPack)
 			{
-				totalItemVolume += itemsToPack[currentItemIndex].Volume;
+				totalItemVolume += item.Volume;
 			}
 
 			firstGap = new ScrapPad();
@@ -608,28 +609,28 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			layerCount = 0;
 
-			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
+			foreach (var item in itemsToPack)
 			{
 				for (y = 1; y <= 3; y++)
 				{
 					switch (y)
 					{
 						case 1:
-							exdim = itemsToPack[currentItemIndex].Dim1;
-							dimen2 = itemsToPack[currentItemIndex].Dim2;
-							dimen3 = itemsToPack[currentItemIndex].Dim3;
+							exdim = item.Dim1;
+							dimen2 = item.Dim2;
+							dimen3 = item.Dim3;
 							break;
 
 						case 2:
-							exdim = itemsToPack[currentItemIndex].Dim2;
-							dimen2 = itemsToPack[currentItemIndex].Dim1;
-							dimen3 = itemsToPack[currentItemIndex].Dim3;
+							exdim = item.Dim2;
+							dimen2 = item.Dim1;
+							dimen3 = item.Dim3;
 							break;
 
 						case 3:
-							exdim = itemsToPack[currentItemIndex].Dim3;
-							dimen2 = itemsToPack[currentItemIndex].Dim1;
-							dimen3 = itemsToPack[currentItemIndex].Dim2;
+							exdim = item.Dim3;
+							dimen2 = item.Dim1;
+							dimen3 = item.Dim2;
 							break;
 					}
 
@@ -650,19 +651,19 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 					layereval = 0;
 
-					for (z = 1; z <= itemsToPackCount; z++)
+					foreach (var itemToPack in itemsToPack)
 					{
-						if (!(currentItemIndex == z))
+						if (item != itemToPack)
 						{
-							dimdif = Math.Abs(exdim - itemsToPack[z].Dim1);
+							dimdif = Math.Abs(exdim - itemToPack.Dim1);
 
-							if (Math.Abs(exdim - itemsToPack[z].Dim2) < dimdif)
+							if (Math.Abs(exdim - itemToPack.Dim2) < dimdif)
 							{
-								dimdif = Math.Abs(exdim - itemsToPack[z].Dim2);
+								dimdif = Math.Abs(exdim - itemToPack.Dim2);
 							}
-							if (Math.Abs(exdim - itemsToPack[z].Dim3) < dimdif)
+							if (Math.Abs(exdim - itemToPack.Dim3) < dimdif)
 							{
-								dimdif = Math.Abs(exdim - itemsToPack[z].Dim3);
+								dimdif = Math.Abs(exdim - itemToPack.Dim3);
 							}
 							layereval += dimdif;
 						}
