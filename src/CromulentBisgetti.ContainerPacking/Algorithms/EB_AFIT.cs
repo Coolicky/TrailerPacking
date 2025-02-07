@@ -68,11 +68,13 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		private bool abortPacking;
 
 		private int bestIteration;
-		// private int bestBoxIndex;
 		private Item bestBox;
+
+		private Item currentItem;
 		private int currentItemIndex;
+
 		private Item currentBox;
-		private int currentBoxIndex;
+
 		private Item candidateBox;
 		private int candidateBoxIndex;
 		private int layerCount;
@@ -138,7 +140,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestFitRemainingY = currentHeight - itemHeight;
 						bestFitRemainingZ = Math.Abs(currentDepth - itemDepth);
 						currentBox = itemsToPack[currentItemIndex];
-						currentBoxIndex = currentItemIndex;
 					}
 					else if (currentHeight - itemHeight == bestFitRemainingY && maxWidthAvailable - itemWidth < bestFitRemainingX)
 					{
@@ -149,7 +150,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestFitRemainingY = currentHeight - itemHeight;
 						bestFitRemainingZ = Math.Abs(currentDepth - itemDepth);
 						currentBox = itemsToPack[currentItemIndex];
-						currentBoxIndex = currentItemIndex;
 					}
 					else if (currentHeight - itemHeight == bestFitRemainingY && maxWidthAvailable - itemWidth == bestFitRemainingX && Math.Abs(currentDepth - itemDepth) < bestFitRemainingZ)
 					{
@@ -160,7 +160,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						bestFitRemainingY = currentHeight - itemHeight;
 						bestFitRemainingZ = Math.Abs(currentDepth - itemDepth);
 						currentBox = itemsToPack[currentItemIndex];
-						currentBoxIndex = currentItemIndex;
 					}
 				}
 				else
@@ -206,10 +205,10 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		{
 			isEvened = false;
 
-			if (currentBoxIndex != 0)
+			if (currentBox != null)
 			{
 				candidateBox = currentBox;
-				candidateBoxIndex = currentBoxIndex;
+				candidateBoxIndex = itemsToPack.IndexOf(currentBox);
 				candidateBoxWidth = currentBoxWidth;
 				candidateBoxHeight = currentBoxHeight;
 				candidateBoxDepth = currentBoxDepth;
@@ -313,9 +312,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				remainingDepth = containerWidth;
 				packedItemCount = 0;
 
-				for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
+				foreach (var item in itemsToPack)
 				{
-					itemsToPack[currentItemIndex].IsPacked = false;
+					item.IsPacked = false;
 				}
 
 				do
@@ -377,7 +376,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			bestBoxFitRemainingY = 32767;
 			bestBoxFitRemainingZ = 32767;
 			currentBox = null;
-			currentBoxIndex = 0;
 			bestBox = null;
 
 			for (y = 1; y <= itemsToPackCount; y += itemsToPack[y].Quantity)
@@ -445,62 +443,83 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			currentLayerThickness = 0;
 			eval = 1000000;
 
-			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
+			foreach (var item in itemsToPack.Where(item => !item.IsPacked))
 			{
-				if (itemsToPack[currentItemIndex].IsPacked) continue;
-
+				currentItemIndex = itemsToPack.IndexOf(item);
 				for (y = 1; y <= 3; y++)
 				{
 					switch (y)
 					{
 						case 1:
-							exdim = itemsToPack[currentItemIndex].Dim1;
-							dimen2 = itemsToPack[currentItemIndex].Dim2;
-							dimen3 = itemsToPack[currentItemIndex].Dim3;
+							exdim = item.Dim1;
+							dimen2 = item.Dim2;
+							dimen3 = item.Dim3;
 							break;
 
 						case 2:
-							exdim = itemsToPack[currentItemIndex].Dim2;
-							dimen2 = itemsToPack[currentItemIndex].Dim1;
-							dimen3 = itemsToPack[currentItemIndex].Dim3;
+							exdim = item.Dim2;
+							dimen2 = item.Dim1;
+							dimen3 = item.Dim3;
 							break;
 
 						case 3:
-							exdim = itemsToPack[currentItemIndex].Dim3;
-							dimen2 = itemsToPack[currentItemIndex].Dim1;
-							dimen3 = itemsToPack[currentItemIndex].Dim2;
+							exdim = item.Dim3;
+							dimen2 = item.Dim1;
+							dimen3 = item.Dim2;
 							break;
 					}
 
 					layereval = 0;
 
-					if (exdim <= thickness && (dimen2 <= containerLength && dimen3 <= containerWidth || dimen3 <= containerLength && dimen2 <= containerWidth))
+					if (exdim > thickness || ((dimen2 > containerLength || dimen3 > containerWidth) && (dimen3 > containerLength || dimen2 > containerWidth)))
+						continue;
+
+					// TODO: this loop seems not to work. Investigate later
+					// foreach (var itemToPack in itemsToPack)
+					// {
+					// 	if (itemToPack == item || itemToPack.IsPacked)
+					// 		continue;
+					//
+					// 	dimdif = Math.Abs(exdim - itemToPack.Dim1);
+					//
+					// 	if (Math.Abs(exdim - itemToPack.Dim2) < dimdif)
+					// 	{
+					// 		dimdif = Math.Abs(exdim - itemToPack.Dim2);
+					// 	}
+					//
+					// 	if (Math.Abs(exdim - itemToPack.Dim3) < dimdif)
+					// 	{
+					// 		dimdif = Math.Abs(exdim - itemToPack.Dim3);
+					// 	}
+					//
+					// 	layereval += dimdif;
+					// }
+					
+					
+					for (z = 1; z <= itemsToPackCount; z++)
 					{
-						for (z = 1; z <= itemsToPackCount; z++)
+						if (currentItemIndex == z || itemsToPack[z].IsPacked)
+							continue;
+						
+						dimdif = Math.Abs(exdim - itemsToPack[z].Dim1);
+					
+						if (Math.Abs(exdim - itemsToPack[z].Dim2) < dimdif)
 						{
-							if (!(currentItemIndex == z) && !itemsToPack[z].IsPacked)
-							{
-								dimdif = Math.Abs(exdim - itemsToPack[z].Dim1);
-
-								if (Math.Abs(exdim - itemsToPack[z].Dim2) < dimdif)
-								{
-									dimdif = Math.Abs(exdim - itemsToPack[z].Dim2);
-								}
-
-								if (Math.Abs(exdim - itemsToPack[z].Dim3) < dimdif)
-								{
-									dimdif = Math.Abs(exdim - itemsToPack[z].Dim3);
-								}
-
-								layereval += dimdif;
-							}
+							dimdif = Math.Abs(exdim - itemsToPack[z].Dim2);
 						}
-
-						if (layereval < eval)
+					
+						if (Math.Abs(exdim - itemsToPack[z].Dim3) < dimdif)
 						{
-							eval = layereval;
-							currentLayerThickness = exdim;
+							dimdif = Math.Abs(exdim - itemsToPack[z].Dim3);
 						}
+					
+						layereval += dimdif;
+					}
+
+					if (layereval < eval)
+					{
+						eval = layereval;
+						currentLayerThickness = exdim;
 					}
 				}
 			}
@@ -982,9 +1001,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			remainingHeight = containerHeight;
 			remainingDepth = containerWidth;
 
-			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
+			foreach (var item in itemsToPack)
 			{
-				itemsToPack[currentItemIndex].IsPacked = false;
+				item.IsPacked = false;
 			}
 
 			do
