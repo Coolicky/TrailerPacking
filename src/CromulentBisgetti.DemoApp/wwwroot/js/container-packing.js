@@ -83,12 +83,12 @@ var ViewModel = function () {
 
 	self.GenerateItemsToPack = function () {
 		self.ItemsToPack([]);
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1000, Name: 'Item1', Length: 5, Width: 4, Height: 2, Quantity: 1 }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1001, Name: 'Item2', Length: 2, Width: 1, Height: 1, Quantity: 3 }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1002, Name: 'Item3', Length: 9, Width: 7, Height: 3, Quantity: 4 }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1003, Name: 'Item4', Length: 13, Width: 6, Height: 3, Quantity: 8 }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1004, Name: 'Item5', Length: 17, Width: 8, Height: 6, Quantity: 1 }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1005, Name: 'Item6', Length: 3, Width: 3, Height: 2, Quantity: 2 }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1000, Name: 'Item1', Length: 5, Width: 4, Height: 2, Quantity: 1, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1001, Name: 'Item2', Length: 2, Width: 1, Height: 1, Quantity: 3, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1002, Name: 'Item3', Length: 9, Width: 7, Height: 3, Quantity: 4, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1003, Name: 'Item4', Length: 13, Width: 6, Height: 3, Quantity: 8, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1004, Name: 'Item5', Length: 17, Width: 8, Height: 6, Quantity: 1, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1005, Name: 'Item6', Length: 3, Width: 3, Height: 2, Quantity: 2, IsStackable: true }));
 	};
 	
 	self.GenerateContainers = function () {
@@ -126,6 +126,7 @@ var ViewModel = function () {
 		self.NewItemToPack.Width('');
 		self.NewItemToPack.Height('');
 		self.NewItemToPack.Quantity('');
+		self.NewItemToPack.IsStackable(true);
 	};
 
 	self.RemoveItemToPack = function (item) {
@@ -160,7 +161,8 @@ var ViewModel = function () {
 				Dim1: item.Length(),
 				Dim2: item.Width(),
 				Dim3: item.Height(),
-				Quantity: item.Quantity()
+				Quantity: item.Quantity(),
+				IsStackable: item.IsStackable()
 			};
 			
 			itemsToPack.push(itemToPack);
@@ -276,6 +278,7 @@ var ItemToPack = function () {
 	this.Width = '';
 	this.Height = '',
 	this.Quantity = '';
+	this.IsStackable = true;
 }
 
 var Container = function () {

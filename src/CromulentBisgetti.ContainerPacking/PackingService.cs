@@ -40,7 +40,7 @@ namespace CromulentBisgetti.ContainerPacking
 
 					itemsToPack.ForEach(item =>
 					{
-						items.Add(new Item(item.ID, item.Dim1, item.Dim2, item.Dim3, item.Quantity));
+						items.Add(new Item(item.ID, item.Dim1, item.Dim2, item.Dim3, item.Quantity, item.IsStackable));
 					});
 
 					Stopwatch stopwatch = new Stopwatch();

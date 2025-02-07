@@ -1,4 +1,5 @@
 ﻿using CromulentBisgetti.ContainerPacking.Entities;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +40,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			}
 
 			algoResult.PackedItems = itemsPackedInOrder;
-			
-
 
 			if (algoResult.UnpackedItems.Count == 0)
 			{
@@ -50,6 +49,20 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			return algoResult;
 		}
 
+		private (decimal xStart, decimal xEnd, decimal zStart, decimal zEnd) CalculateItemPosition(
+			ScrapPad gap, decimal innerWidth, decimal innerDepth)
+		{
+			decimal containerWidth = px;
+
+			if (gap.CumX == containerWidth)
+			{
+				return (0, gap.CumX, gap.CumZ, gap.CumZ + innerDepth);
+			}
+			
+			return (gap.CumX - innerWidth, gap.CumX, gap.CumZ, gap.CumZ + innerDepth);
+		}
+
+		private List<BlockedRegion> blockedRegions = new();
 
 		private List<Item> itemsToPack;
 		private List<Item> itemsPackedInOrder;
@@ -73,7 +86,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		private int cboxi;
 		private int layerListLen;
 		private int packedItemCount;
-		private int x;
+		private int currentItemIndex;
 
 		private decimal bbfx;
 		private decimal bbfy;
@@ -84,9 +97,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		private decimal bfx;
 		private decimal bfy;
 		private decimal bfz;
-		private decimal boxx;
-		private decimal boxy;
-		private decimal boxz;
+		private decimal boxX;
+		private decimal boxY;
+		private decimal boxZ;
 		private decimal cboxx;
 		private decimal cboxy;
 		private decimal cboxz;
@@ -94,7 +107,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		private decimal layerThickness;
 		private decimal lilz;
 		private decimal packedVolume;
-		private decimal packedy;
+		private decimal packedY;
 		private decimal prelayer;
 		private decimal prepackedy;
 		private decimal preremainpy;
@@ -110,74 +123,95 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		/// <summary>
 		/// Analyzes each unpacked box to find the best fitting one to the empty space given.
 		/// </summary>
-		private void AnalyzeBox(decimal hmx, decimal hy, decimal hmy, decimal hz, decimal hmz, decimal dim1, decimal dim2, decimal dim3)
+		private void AnalyzeBox(decimal hmx, decimal hy, decimal hmy, decimal hz, decimal hmz, decimal itemWidth, decimal itemHeight, decimal itemDepth)
 		{
-			if (dim1 <= hmx && dim2 <= hmy && dim3 <= hmz)
+			if (itemWidth <= hmx && itemHeight <= hmy && itemDepth <= hmz)
 			{
-				if (dim2 <= hy)
+				decimal xStart = scrapfirst.CumX - itemWidth;
+				decimal zStart = smallestZ.CumZ;
+				decimal xEnd = smallestZ.CumX;
+				decimal zEnd = smallestZ.CumZ + itemDepth;
+				bool isOverlapping = blockedRegions.Any(r => 
+					packedY >= r.MinYLevel &&
+					xStart < r.XEnd &&
+					xEnd > r.XStart &&
+					zStart < r.ZEnd &&
+					zEnd > r.ZStart);
+				
+				
+				Log.Logger.Information($"hmx-{hmx}|hy-{hy}|hmy-{hmy}|hz-{hz}|hmz-{hmz}|itemWidth-{itemWidth}|itemHeight-{itemHeight}|itemDepth-{itemDepth}");
+				
+				Log.Logger.Information("AnalyzeBox->" + xStart + "|" + xEnd + "|" + zStart + "|" + zEnd);
+				if (isOverlapping)
 				{
-					if (hy - dim2 < bfy)
+					Log.Logger.Information("AnalyzeBox");
+					return;
+				}
+				
+				if (itemHeight <= hy)
+				{
+					if (hy - itemHeight < bfy)
 					{
-						boxx = dim1;
-						boxy = dim2;
-						boxz = dim3;
-						bfx = hmx - dim1;
-						bfy = hy - dim2;
-						bfz = Math.Abs(hz - dim3);
-						boxi = x;
+						boxX = itemWidth;
+						boxY = itemHeight;
+						boxZ = itemDepth;
+						bfx = hmx - itemWidth;
+						bfy = hy - itemHeight;
+						bfz = Math.Abs(hz - itemDepth);
+						boxi = currentItemIndex;
 					}
-					else if (hy - dim2 == bfy && hmx - dim1 < bfx)
+					else if (hy - itemHeight == bfy && hmx - itemWidth < bfx)
 					{
-						boxx = dim1;
-						boxy = dim2;
-						boxz = dim3;
-						bfx = hmx - dim1;
-						bfy = hy - dim2;
-						bfz = Math.Abs(hz - dim3);
-						boxi = x;
+						boxX = itemWidth;
+						boxY = itemHeight;
+						boxZ = itemDepth;
+						bfx = hmx - itemWidth;
+						bfy = hy - itemHeight;
+						bfz = Math.Abs(hz - itemDepth);
+						boxi = currentItemIndex;
 					}
-					else if (hy - dim2 == bfy && hmx - dim1 == bfx && Math.Abs(hz - dim3) < bfz)
+					else if (hy - itemHeight == bfy && hmx - itemWidth == bfx && Math.Abs(hz - itemDepth) < bfz)
 					{
-						boxx = dim1;
-						boxy = dim2;
-						boxz = dim3;
-						bfx = hmx - dim1;
-						bfy = hy - dim2;
-						bfz = Math.Abs(hz - dim3);
-						boxi = x;
+						boxX = itemWidth;
+						boxY = itemHeight;
+						boxZ = itemDepth;
+						bfx = hmx - itemWidth;
+						bfy = hy - itemHeight;
+						bfz = Math.Abs(hz - itemDepth);
+						boxi = currentItemIndex;
 					}
 				}
 				else
 				{
-					if (dim2 - hy < bbfy)
+					if (itemHeight - hy < bbfy)
 					{
-						bboxx = dim1;
-						bboxy = dim2;
-						bboxz = dim3;
-						bbfx = hmx - dim1;
-						bbfy = dim2 - hy;
-						bbfz = Math.Abs(hz - dim3);
-						bboxi = x;
+						bboxx = itemWidth;
+						bboxy = itemHeight;
+						bboxz = itemDepth;
+						bbfx = hmx - itemWidth;
+						bbfy = itemHeight - hy;
+						bbfz = Math.Abs(hz - itemDepth);
+						bboxi = currentItemIndex;
 					}
-					else if (dim2 - hy == bbfy && hmx - dim1 < bbfx)
+					else if (itemHeight - hy == bbfy && hmx - itemWidth < bbfx)
 					{
-						bboxx = dim1;
-						bboxy = dim2;
-						bboxz = dim3;
-						bbfx = hmx - dim1;
-						bbfy = dim2 - hy;
-						bbfz = Math.Abs(hz - dim3);
-						bboxi = x;
+						bboxx = itemWidth;
+						bboxy = itemHeight;
+						bboxz = itemDepth;
+						bbfx = hmx - itemWidth;
+						bbfy = itemHeight - hy;
+						bbfz = Math.Abs(hz - itemDepth);
+						bboxi = currentItemIndex;
 					}
-					else if (dim2 - hy == bbfy && hmx - dim1 == bbfx && Math.Abs(hz - dim3) < bbfz)
+					else if (itemHeight - hy == bbfy && hmx - itemWidth == bbfx && Math.Abs(hz - itemDepth) < bbfz)
 					{
-						bboxx = dim1;
-						bboxy = dim2;
-						bboxz = dim3;
-						bbfx = hmx - dim1;
-						bbfy = dim2 - hy;
-						bbfz = Math.Abs(hz - dim3);
-						bboxi = x;
+						bboxx = itemWidth;
+						bboxy = itemHeight;
+						bboxz = itemDepth;
+						bbfx = hmx - itemWidth;
+						bbfy = itemHeight - hy;
+						bbfz = Math.Abs(hz - itemDepth);
+						bboxi = currentItemIndex;
 					}
 				}
 			}
@@ -193,13 +227,13 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			if (boxi != 0)
 			{
 				cboxi = boxi;
-				cboxx = boxx;
-				cboxy = boxy;
-				cboxz = boxz;
+				cboxx = boxX;
+				cboxy = boxY;
+				cboxz = boxZ;
 			}
 			else
 			{
-				if ((bboxi > 0) && (layerinlayer != 0 || (smallestZ.Pre == null && smallestZ.Post == null)))
+				if (bboxi > 0 && (layerinlayer != 0 || smallestZ.Pre == null && smallestZ.Post == null))
 				{
 					if (layerinlayer == 0)
 					{
@@ -286,10 +320,10 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				ListCanditLayers();
 				layers = layers.OrderBy(l => l.LayerEval).ToList();
 
-				for (layersIndex = 1; (layersIndex <= layerListLen) && !quit; layersIndex++)
+				for (layersIndex = 1; layersIndex <= layerListLen && !quit; layersIndex++)
 				{
 					packedVolume = 0.0M;
-					packedy = 0;
+					packedY = 0;
 					packing = true;
 					layerThickness = layers[layersIndex].LayerDim;
 					itelayer = layersIndex;
@@ -297,9 +331,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					remainpz = pz;
 					packedItemCount = 0;
 
-					for (x = 1; x <= itemsToPackCount; x++)
+					for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
 					{
-						itemsToPack[x].IsPacked = false;
+						itemsToPack[currentItemIndex].IsPacked = false;
 					}
 
 					do
@@ -309,22 +343,22 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 						PackLayer();
 
-						packedy += layerThickness;
-						remainpy = py - packedy;
+						packedY += layerThickness;
+						remainpy = py - packedY;
 
 						if (layerinlayer != 0 && !quit)
 						{
-							prepackedy = packedy;
+							prepackedy = packedY;
 							preremainpy = remainpy;
 							remainpy = layerThickness - prelayer;
-							packedy = packedy - layerThickness + prelayer;
+							packedY = packedY - layerThickness + prelayer;
 							remainpz = lilz;
 							layerThickness = layerinlayer;
 							layerDone = false;
 
 							PackLayer();
 
-							packedy = prepackedy;
+							packedY = prepackedy;
 							remainpy = preremainpy;
 							remainpz = pz;
 						}
@@ -332,7 +366,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 						FindLayer(remainpy);
 					} while (packing && !quit);
 
-					if ((packedVolume > bestVolume) && !quit)
+					if (packedVolume > bestVolume && !quit)
 					{
 						bestVolume = packedVolume;
 						bestIteration = itelayer;
@@ -362,24 +396,46 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			for (y = 1; y <= itemsToPackCount; y += itemsToPack[y].Quantity)
 			{
-				for (x = y; x < x + itemsToPack[y].Quantity - 1; x++)
+				for (currentItemIndex = y; currentItemIndex < currentItemIndex + itemsToPack[y].Quantity - 1; currentItemIndex++)
 				{
-					if (!itemsToPack[x].IsPacked) break;
+					if (!itemsToPack[currentItemIndex].IsPacked) break;
 				}
 
-				if (itemsToPack[x].IsPacked) continue;
+				if (itemsToPack[currentItemIndex].IsPacked) continue;
 
-				if (x > itemsToPackCount) return;
+				if (currentItemIndex > itemsToPackCount) return;
 
-				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[x].Dim1, itemsToPack[x].Dim2, itemsToPack[x].Dim3);
+				if (!itemsToPack[currentItemIndex].IsStackable)
+				{
+					var (xStart, xEnd, zStart, zEnd) = CalculateItemPosition(
+						smallestZ,
+						itemsToPack[currentItemIndex].Dim1,
+						itemsToPack[currentItemIndex].Dim3);
+					bool isOverlapping = blockedRegions.Any(r => 
+						packedY >= r.MinYLevel &&
+						xStart < r.XEnd &&
+						xEnd > r.XStart &&
+						zStart < r.ZEnd &&
+						zEnd > r.ZStart);
+					Log.Logger.Information("FindBox->" + xStart + "|" + xEnd + "|" + zStart + "|" + zEnd);
+					if (isOverlapping)
+					{
+						Log.Logger.Information("FindBox");
+						continue;
+					} 
+				}
 
-				if ((itemsToPack[x].Dim1 == itemsToPack[x].Dim3) && (itemsToPack[x].Dim3 == itemsToPack[x].Dim2)) continue;
+				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim1, itemsToPack[currentItemIndex].Dim2, itemsToPack[currentItemIndex].Dim3);
 
-				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[x].Dim1, itemsToPack[x].Dim3, itemsToPack[x].Dim2);
-				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[x].Dim2, itemsToPack[x].Dim1, itemsToPack[x].Dim3);
-				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[x].Dim2, itemsToPack[x].Dim3, itemsToPack[x].Dim1);
-				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[x].Dim3, itemsToPack[x].Dim1, itemsToPack[x].Dim2);
-				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[x].Dim3, itemsToPack[x].Dim2, itemsToPack[x].Dim1);
+				if (itemsToPack[currentItemIndex].Dim1 == itemsToPack[currentItemIndex].Dim3 &&
+				    itemsToPack[currentItemIndex].Dim3 == itemsToPack[currentItemIndex].Dim2)
+					continue;
+
+				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim1, itemsToPack[currentItemIndex].Dim3, itemsToPack[currentItemIndex].Dim2);
+				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim2, itemsToPack[currentItemIndex].Dim1, itemsToPack[currentItemIndex].Dim3);
+				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim2, itemsToPack[currentItemIndex].Dim3, itemsToPack[currentItemIndex].Dim1);
+				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim3, itemsToPack[currentItemIndex].Dim1, itemsToPack[currentItemIndex].Dim2);
+				AnalyzeBox(hmx, hy, hmy, hz, hmz, itemsToPack[currentItemIndex].Dim3, itemsToPack[currentItemIndex].Dim2, itemsToPack[currentItemIndex].Dim1);
 			}
 		}
 
@@ -399,40 +455,40 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			layerThickness = 0;
 			eval = 1000000;
 
-			for (x = 1; x <= itemsToPackCount; x++)
+			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
 			{
-				if (itemsToPack[x].IsPacked) continue;
+				if (itemsToPack[currentItemIndex].IsPacked) continue;
 
 				for (y = 1; y <= 3; y++)
 				{
 					switch (y)
 					{
 						case 1:
-							exdim = itemsToPack[x].Dim1;
-							dimen2 = itemsToPack[x].Dim2;
-							dimen3 = itemsToPack[x].Dim3;
+							exdim = itemsToPack[currentItemIndex].Dim1;
+							dimen2 = itemsToPack[currentItemIndex].Dim2;
+							dimen3 = itemsToPack[currentItemIndex].Dim3;
 							break;
 
 						case 2:
-							exdim = itemsToPack[x].Dim2;
-							dimen2 = itemsToPack[x].Dim1;
-							dimen3 = itemsToPack[x].Dim3;
+							exdim = itemsToPack[currentItemIndex].Dim2;
+							dimen2 = itemsToPack[currentItemIndex].Dim1;
+							dimen3 = itemsToPack[currentItemIndex].Dim3;
 							break;
 
 						case 3:
-							exdim = itemsToPack[x].Dim3;
-							dimen2 = itemsToPack[x].Dim1;
-							dimen3 = itemsToPack[x].Dim2;
+							exdim = itemsToPack[currentItemIndex].Dim3;
+							dimen2 = itemsToPack[currentItemIndex].Dim1;
+							dimen3 = itemsToPack[currentItemIndex].Dim2;
 							break;
 					}
 
 					layereval = 0;
 
-					if ((exdim <= thickness) && (((dimen2 <= px) && (dimen3 <= pz)) || ((dimen3 <= px) && (dimen2 <= pz))))
+					if (exdim <= thickness && (dimen2 <= px && dimen3 <= pz || dimen3 <= px && dimen2 <= pz))
 					{
 						for (z = 1; z <= itemsToPackCount; z++)
 						{
-							if (!(x == z) && !(itemsToPack[z].IsPacked))
+							if (!(currentItemIndex == z) && !itemsToPack[z].IsPacked)
 							{
 								dimdif = Math.Abs(exdim - itemsToPack[z].Dim1);
 
@@ -492,7 +548,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			// The original code uses 1-based indexing everywhere. This fake entry is added to the beginning
 			// of the list to make that possible.
-			itemsToPack.Add(new Item(0, 0, 0, 0, 0));
+			itemsToPack.Add(new Item(0, 0, 0, 0, 0, true));
 
 			layers = new List<Layer>();
 			itemsToPackCount = 0;
@@ -501,21 +557,21 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			{
 				for (int i = 1; i <= item.Quantity; i++)
 				{
-					Item newItem = new Item(item.ID, item.Dim1, item.Dim2, item.Dim3, item.Quantity);
+					Item newItem = new Item(item.ID, item.Dim1, item.Dim2, item.Dim3, item.Quantity, item.IsStackable);
 					itemsToPack.Add(newItem);
 				}
 
 				itemsToPackCount += item.Quantity;
 			}
 
-			itemsToPack.Add(new Item(0, 0, 0, 0, 0));
+			itemsToPack.Add(new Item(0, 0, 0, 0, 0, true));
 
 			totalContainerVolume = container.Length * container.Height * container.Width;
 			totalItemVolume = 0.0M;
 
-			for (x = 1; x <= itemsToPackCount; x++)
+			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
 			{
-				totalItemVolume += itemsToPack[x].Volume;
+				totalItemVolume += itemsToPack[currentItemIndex].Volume;
 			}
 
 			scrapfirst = new ScrapPad();
@@ -544,32 +600,32 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			layerListLen = 0;
 
-			for (x = 1; x <= itemsToPackCount; x++)
+			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
 			{
 				for (y = 1; y <= 3; y++)
 				{
 					switch (y)
 					{
 						case 1:
-							exdim = itemsToPack[x].Dim1;
-							dimen2 = itemsToPack[x].Dim2;
-							dimen3 = itemsToPack[x].Dim3;
+							exdim = itemsToPack[currentItemIndex].Dim1;
+							dimen2 = itemsToPack[currentItemIndex].Dim2;
+							dimen3 = itemsToPack[currentItemIndex].Dim3;
 							break;
 
 						case 2:
-							exdim = itemsToPack[x].Dim2;
-							dimen2 = itemsToPack[x].Dim1;
-							dimen3 = itemsToPack[x].Dim3;
+							exdim = itemsToPack[currentItemIndex].Dim2;
+							dimen2 = itemsToPack[currentItemIndex].Dim1;
+							dimen3 = itemsToPack[currentItemIndex].Dim3;
 							break;
 
 						case 3:
-							exdim = itemsToPack[x].Dim3;
-							dimen2 = itemsToPack[x].Dim1;
-							dimen3 = itemsToPack[x].Dim2;
+							exdim = itemsToPack[currentItemIndex].Dim3;
+							dimen2 = itemsToPack[currentItemIndex].Dim1;
+							dimen3 = itemsToPack[currentItemIndex].Dim2;
 							break;
 					}
 
-					if ((exdim > py) || (((dimen2 > px) || (dimen3 > pz)) && ((dimen3 > px) || (dimen2 > pz)))) continue;
+					if (exdim > py || (dimen2 > px || dimen3 > pz) && (dimen3 > px || dimen2 > pz)) continue;
 
 					same = false;
 
@@ -588,7 +644,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 					for (z = 1; z <= itemsToPackCount; z++)
 					{
-						if (!(x == z))
+						if (!(currentItemIndex == z))
 						{
 							dimdif = Math.Abs(exdim - itemsToPack[z].Dim1);
 
@@ -665,7 +721,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			{
 				FindSmallestZ();
 
-				if ((smallestZ.Pre == null) && (smallestZ.Post == null))
+				if (smallestZ.Pre == null && smallestZ.Post == null)
 				{
 					//*** SITUATION-1: NO BOXES ON THE RIGHT AND LEFT SIDES ***
 
@@ -678,7 +734,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					if (evened) continue;
 
 					itemsToPack[cboxi].CoordX = 0;
-					itemsToPack[cboxi].CoordY = packedy;
+					itemsToPack[cboxi].CoordY = packedY;
 					itemsToPack[cboxi].CoordZ = smallestZ.CumZ;
 					if (cboxx == smallestZ.CumX)
 					{
@@ -709,7 +765,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					if (layerDone) break;
 					if (evened) continue;
 
-					itemsToPack[cboxi].CoordY = packedy;
+					itemsToPack[cboxi].CoordY = packedY;
 					itemsToPack[cboxi].CoordZ = smallestZ.CumZ;
 					if (cboxx == smallestZ.CumX)
 					{
@@ -766,7 +822,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					if (layerDone) break;
 					if (evened) continue;
 
-					itemsToPack[cboxi].CoordY = packedy;
+					itemsToPack[cboxi].CoordY = packedY;
 					itemsToPack[cboxi].CoordZ = smallestZ.CumZ;
 					itemsToPack[cboxi].CoordX = smallestZ.Pre.CumX;
 
@@ -816,7 +872,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					if (layerDone) break;
 					if (evened) continue;
 
-					itemsToPack[cboxi].CoordY = packedy;
+					itemsToPack[cboxi].CoordY = packedY;
 					itemsToPack[cboxi].CoordZ = smallestZ.CumZ;
 
 					if (cboxx == smallestZ.CumX - smallestZ.Pre.CumX)
@@ -895,13 +951,13 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					if (layerDone) break;
 					if (evened) continue;
 
-					itemsToPack[cboxi].CoordY = packedy;
+					itemsToPack[cboxi].CoordY = packedY;
 					itemsToPack[cboxi].CoordZ = smallestZ.CumZ;
 					itemsToPack[cboxi].CoordX = smallestZ.Pre.CumX;
 
-					if (cboxx == (smallestZ.CumX - smallestZ.Pre.CumX))
+					if (cboxx == smallestZ.CumX - smallestZ.Pre.CumX)
 					{
-						if ((smallestZ.CumZ + cboxz) == smallestZ.Pre.CumZ)
+						if (smallestZ.CumZ + cboxz == smallestZ.Pre.CumZ)
 						{
 							smallestZ.Pre.CumX = smallestZ.CumX;
 							smallestZ.Pre.Post = smallestZ.Post;
@@ -914,7 +970,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					}
 					else
 					{
-						if ((smallestZ.CumZ + cboxz) == smallestZ.Pre.CumZ)
+						if (smallestZ.CumZ + cboxz == smallestZ.Pre.CumZ)
 						{
 							smallestZ.Pre.CumX += cboxx;
 						}
@@ -964,15 +1020,15 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			ListCanditLayers();
 			layers = layers.OrderBy(l => l.LayerEval).ToList();
 			packedVolume = 0;
-			packedy = 0;
+			packedY = 0;
 			packing = true;
 			layerThickness = layers[bestIteration].LayerDim;
 			remainpy = py;
 			remainpz = pz;
 
-			for (x = 1; x <= itemsToPackCount; x++)
+			for (currentItemIndex = 1; currentItemIndex <= itemsToPackCount; currentItemIndex++)
 			{
-				itemsToPack[x].IsPacked = false;
+				itemsToPack[currentItemIndex].IsPacked = false;
 			}
 
 			do
@@ -980,20 +1036,20 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				layerinlayer = 0;
 				layerDone = false;
 				PackLayer();
-				packedy += layerThickness;
-				remainpy = py - packedy;
+				packedY += layerThickness;
+				remainpy = py - packedY;
 
 				if (layerinlayer > 0.0001M)
 				{
-					prepackedy = packedy;
+					prepackedy = packedY;
 					preremainpy = remainpy;
 					remainpy = layerThickness - prelayer;
-					packedy = packedy - layerThickness + prelayer;
+					packedY = packedY - layerThickness + prelayer;
 					remainpz = lilz;
 					layerThickness = layerinlayer;
 					layerDone = false;
 					PackLayer();
-					packedy = prepackedy;
+					packedY = prepackedy;
 					remainpy = preremainpy;
 					remainpz = pz;
 				}
@@ -1016,6 +1072,16 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			itemsToPack[cboxi].PackDimZ = cboxz;
 			packedVolume += itemsToPack[cboxi].Volume;
 			packedItemCount++;
+
+			if (!itemsToPack[cboxi].IsStackable)
+			{
+				var x1 = itemsToPack[cboxi].CoordX;
+				var z1 = itemsToPack[cboxi].CoordZ;
+				var x2 = x1 + itemsToPack[cboxi].PackDimX;
+				var z2 = z1 + itemsToPack[cboxi].PackDimZ;
+				var minY = packedY + cboxy;
+				blockedRegions.Add(new BlockedRegion(x1, x2, z1, z2, minY));
+			}
 
 			if (packingBest)
 			{
@@ -1097,6 +1163,24 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			/// The previous entry.
 			/// </value>
 			public ScrapPad Pre { get; set; }
+		}
+
+		private record BlockedRegion
+		{
+			public BlockedRegion(decimal xStart, decimal xEnd, decimal zStart, decimal zEnd, decimal minY)
+			{
+				XStart = xStart;
+				XEnd = xEnd;
+				ZStart = zStart;
+				ZEnd = zEnd;
+				MinYLevel = minY;
+			}
+
+			public decimal XStart { get; set; }
+			public decimal XEnd { get; set; }
+			public decimal ZStart { get; set; }
+			public decimal ZEnd { get; set; }
+			public decimal MinYLevel { get; set; }
 		}
 	}
 }

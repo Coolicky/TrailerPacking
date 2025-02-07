@@ -18,7 +18,7 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 		/// <param name="dim2">The length of another of the three item dimensions.</param>
 		/// <param name="dim3">The length of the other of the three item dimensions.</param>
 		/// <param name="itemQuantity">The item quantity.</param>
-		public Item(int id, decimal dim1, decimal dim2, decimal dim3, int quantity)
+		public Item(int id, decimal dim1, decimal dim2, decimal dim3, int quantity, bool isStackable)
 		{
 			this.ID = id;
 			this.Dim1 = dim1;
@@ -26,6 +26,7 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 			this.Dim3 = dim3;
 			this.volume = dim1 * dim2 * dim3;
 			this.Quantity = quantity;
+			this.IsStackable = isStackable;
 		}
 
 		/// <summary>
@@ -143,5 +144,7 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 		/// </value>
 		[DataMember]
 		public decimal Volume => volume;
+
+		public bool IsStackable { get; set; } = false;
 	}
 }
