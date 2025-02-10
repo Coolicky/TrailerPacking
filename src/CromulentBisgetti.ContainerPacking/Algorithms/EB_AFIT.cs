@@ -388,13 +388,13 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				    currentItem.Dim3 == currentItem.Dim2)
 					continue;
 
-				// if (item.CanRotateOnSide)
-				// {
-					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim1, currentItem.Dim3, currentItem.Dim2);
-					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim1, currentItem.Dim3);
-					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim3, currentItem.Dim1);
-					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim3, currentItem.Dim1, currentItem.Dim2);
-				// }
+				if (item.CanBePlacedOnSide)
+				{
+					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim1, currentItem.Dim3, currentItem.Dim2);
+					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim1, currentItem.Dim3);
+					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim3, currentItem.Dim1);
+					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim3, currentItem.Dim1, currentItem.Dim2);
+				}
 			}
 		}
 
@@ -526,6 +526,8 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			layers = new List<Layer>();
 			itemsToPackCount = 0;
 
+			ShuffleDimensions(items);
+
 			foreach (var item in items)
 			{
 				for (var i = 1; i <= item.Quantity; i++)
@@ -554,6 +556,67 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 			useBestPacking = false;
 			isFullyPacked = false;
 			abortPacking = false;
+		}
+		private static void ShuffleDimensions(List<Item> items)
+		{
+			var dims = new List<decimal>();
+			foreach (var group in items.GroupBy(r => r.Dim2))
+			{
+				dims.Add(group.Key);
+				if (group.Count() > 1)
+				{
+					var dist = 0.001M;
+					foreach (var item in group)
+					{
+						while (dims.Contains(item.Dim2))
+						{
+							item.Dim2 -= dist;
+							dist += 0.001M;
+						}
+						dims.Add(item.Dim2);
+					}
+				}
+			}
+
+			foreach (var group in items
+				         .Where(r => r.CanBePlacedOnSide)
+				         .GroupBy(r => r.Dim1))
+			{
+				dims.Add(group.Key);
+				if (group.Count() > 1)
+				{
+					var dist = 0.001M;
+					foreach (var item in group)
+					{
+						while (dims.Contains(item.Dim1))
+						{
+							item.Dim1 -= dist;
+							dist += 0.001M;
+						}
+						dims.Add(item.Dim1);
+					}
+				}
+			}
+
+			foreach (var group in items
+				         .Where(r => r.CanBePlacedOnSide)
+				         .GroupBy(r => r.Dim3))
+			{
+				dims.Add(group.Key);
+				if (group.Count() > 1)
+				{
+					var dist = 0.001M;
+					foreach (var item in group)
+					{
+						while (dims.Contains(item.Dim3))
+						{
+							item.Dim3 -= dist;
+							dist += 0.001M;
+						}
+						dims.Add(item.Dim3);
+					}
+				}
+			}
 		}
 
 		/// <summary>

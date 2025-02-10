@@ -146,5 +146,7 @@ namespace CromulentBisgetti.ContainerPacking.Entities
 		public decimal Volume => volume;
 
 		public bool IsStackable { get; set; } = false;
+		public bool CanBePlacedOnSide { get; set; } = false;
+		public bool CanBeStackedOnTop { get; set; } = true;
 	}
 }
