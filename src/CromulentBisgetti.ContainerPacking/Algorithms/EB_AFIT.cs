@@ -1,5 +1,4 @@
 ﻿using CromulentBisgetti.ContainerPacking.Entities;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +22,9 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		{
 			container = trailer; 
 
-			Initialize(trailer, items);
-			ExecuteIterations(trailer);
-			Report(trailer);
+			Initialize(items);
+			ExecuteIterations();
+			Report();
 
 			var algoResult = new AlgorithmPackingResult();
 			algoResult.AlgorithmID = (int)AlgorithmType.EB_AFIT;
@@ -286,7 +285,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		/// <summary>
 		/// Executes the packing algorithm variants.
 		/// </summary>
-		private void ExecuteIterations(Container container)
+		private void ExecuteIterations()
 		{
 			int layersIndex;
 			var bestVolume = 0.0M;
@@ -341,8 +340,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					FindLayer(remainingHeight);
 				} while (isPacking && !abortPacking);
 
-				var packeditems = itemsToPack.Where(i => i.IsPacked).ToList();
-				Log.Information("TotalPackedVolume! -> " + totalPackedVolume);
 				if (totalPackedVolume > bestVolume && !abortPacking)
 				{
 					bestVolume = totalPackedVolume;
@@ -382,34 +379,27 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				}
 
 				if (currentItem.IsPacked) continue;
-
-				//TODO:Check
-				// if (currentItemIndex > itemsToPackCount) return;
-
-				if (IsOverlapping(currentItem))
-				{
-					continue;
-				} 
+				if (IsOverlapping(currentItem)) continue;
 
 				AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim1, currentItem.Dim2, currentItem.Dim3);
+				AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim3, currentItem.Dim2, currentItem.Dim1);
 
 				if (currentItem.Dim1 == currentItem.Dim3 &&
 				    currentItem.Dim3 == currentItem.Dim2)
 					continue;
 
-				//TODO: Not rotated!!!
-				// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim1, currentItem.Dim3, currentItem.Dim2);
-				// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim1, currentItem.Dim3);
-				// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim3, currentItem.Dim1);
-				// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim3, currentItem.Dim1, currentItem.Dim2);
-				// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim3, currentItem.Dim2, currentItem.Dim1);
+				// if (item.CanRotateOnSide)
+				// {
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim1, currentItem.Dim3, currentItem.Dim2);
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim1, currentItem.Dim3);
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim2, currentItem.Dim3, currentItem.Dim1);
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Dim3, currentItem.Dim1, currentItem.Dim2);
+				// }
 			}
-			Log.Information($"BestBox-> {bestBox?.Dim1}|{bestBox?.Dim2}|{bestBox?.Dim3}");
-			Log.Information($"Layer-> {currentLayerThickness}");
 		}
+
 		private bool IsOverlapping(Item item)
 		{
-
 			var xStart = item.CoordX;
 			var zStart = item.CoordZ;
 			var xEnd = xStart + item.Dim1;
@@ -470,28 +460,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 					if (exdim > thickness || ((dimen2 > container.Length || dimen3 > container.Width) && (dimen3 > container.Length || dimen2 > container.Width)))
 						continue;
 
-					// TODO: this loop seems not to work. Investigate later
-					// foreach (var itemToPack in itemsToPack)
-					// {
-					// 	if (itemToPack == item || itemToPack.IsPacked)
-					// 		continue;
-					//
-					// 	dimdif = Math.Abs(exdim - itemToPack.Dim1);
-					//
-					// 	if (Math.Abs(exdim - itemToPack.Dim2) < dimdif)
-					// 	{
-					// 		dimdif = Math.Abs(exdim - itemToPack.Dim2);
-					// 	}
-					//
-					// 	if (Math.Abs(exdim - itemToPack.Dim3) < dimdif)
-					// 	{
-					// 		dimdif = Math.Abs(exdim - itemToPack.Dim3);
-					// 	}
-					//
-					// 	layereval += dimdif;
-					// }
-					
-					
 					for (z = 1; z <= itemsToPackCount; z++)
 					{
 						if (itemsToPack.IndexOf(item) == z || itemsToPack[z].IsPacked)
@@ -545,7 +513,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		/// <summary>
 		/// Initializes everything.
 		/// </summary>
-		private void Initialize(Container container, List<Item> items)
+		private void Initialize(List<Item> items)
 		{
 			itemsToPack = new List<Item>();
 			itemsPackedInOrder = new List<Item>();
@@ -976,7 +944,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 		/// Using the parameters found, packs the best solution found and
 		/// reports to the console.
 		/// </summary>
-		private void Report(Container container)
+		private void Report()
 		{
 			blockedRegions.Clear();
 			abortPacking = false;
@@ -1053,7 +1021,6 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 			if (useBestPacking)
 			{
-				Log.Information($"Packing->{candidateBox.PackDimX}|{candidateBox.PackDimY}|{candidateBox.PackDimZ}");
 				itemsPackedInOrder.Add(candidateBox);
 			}
 			else if (totalPackedVolume == totalContainerVolume || totalPackedVolume == totalItemVolume)
