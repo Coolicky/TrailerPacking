@@ -5,15 +5,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CromulentBisgetti.ContainerPacking.Algorithms
+namespace CromulentBisgetti.ContainerPacking.Algorithms;
+
+public enum AlgorithmType
 {
-	[DataContract]
-	public enum AlgorithmType
-	{
-		/// <summary>
-		/// The EB-AFIT packing algorithm type.
-		/// </summary>
-		[DataMember]
-		EB_AFIT = 1
-	}
+	/// <summary>
+	/// The EB-AFIT packing algorithm type.
+	/// </summary>
+	EB_AFIT = 1
 }
