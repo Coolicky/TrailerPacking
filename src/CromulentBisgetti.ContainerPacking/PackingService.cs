@@ -39,7 +39,7 @@ public static class PackingService
 
 				itemsToPack.ForEach(item =>
 				{
-					items.Add(new Item(item.ID, item.Dim1, item.Dim2, item.Dim3, item.Quantity, item.IsStackable));
+					items.Add(new Item(item.ID, item.Length, item.Height, item.Depth, item.Quantity, item.IsStackable));
 				});
 
 				var stopwatch = new Stopwatch();

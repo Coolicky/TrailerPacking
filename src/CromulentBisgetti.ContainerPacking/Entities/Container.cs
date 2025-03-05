@@ -1,8 +1,7 @@
 ﻿namespace CromulentBisgetti.ContainerPacking.Entities;
 
-public class Container
+public record Container
 {
-
 	public Container(int id, decimal length, decimal width, decimal height)
 	{
 		ID = id;

@@ -7,7 +7,7 @@ namespace CromulentBisgetti.DemoApp.Models
 	{
 		public List<Container> Containers { get; set; }
 
-		public List<Item> ItemsToPack { get; set; }
+		public List<RequestItem> ItemsToPack { get; set; }
 
 		public List<int> AlgorithmTypeIDs { get; set; }
 	}

@@ -2,7 +2,7 @@
 
 namespace CromulentBisgetti.ContainerPacking.Entities;
 
-public class AlgorithmPackingResult
+public record AlgorithmPackingResult
 {
 	public int AlgorithmID { get; set; }
 	public string AlgorithmName { get; set; }
@@ -12,4 +12,5 @@ public class AlgorithmPackingResult
 	public decimal PercentItemVolumePacked { get; set; }
 	public List<Item> PackedItems { get; set; } = [];
 	public List<Item> UnpackedItems { get; set; } = [];
+	public Container Container { get; set; }
 }

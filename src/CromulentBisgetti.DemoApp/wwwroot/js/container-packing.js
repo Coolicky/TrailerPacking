@@ -83,29 +83,81 @@ var ViewModel = function () {
 
 	self.GenerateItemsToPack = function () {
 		self.ItemsToPack([]);
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1000, Name: 'Item1', Length: 5, Width: 4, Height: 2, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1001, Name: 'Item2', Length: 2, Width: 1, Height: 1, Quantity: 3, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1002, Name: 'Item3', Length: 9, Width: 7, Height: 3, Quantity: 4, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1003, Name: 'Item4', Length: 13, Width: 6, Height: 3, Quantity: 8, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1004, Name: 'Item5', Length: 17, Width: 8, Height: 6, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1005, Name: 'Item6', Length: 3, Width: 3, Height: 2, Quantity: 2, IsStackable: true }));
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 11, Name: '11', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 8, Name: '8', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 9, Name: '9', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 10, Name: '10', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 5, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 13, Name: '13', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 2, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 12, Name: '12', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 2, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 14, Name: '14', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 3, Name: '3', Length: 13.5, Width: 10.4, Height: 12.7, Quantity: 1, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1, Name: '1', Length: 13.5, Width: 10.4, Height: 12.7, Quantity: 1, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 16, Name: '16', Length: 13.5, Width: 10.4, Height: 14.0, Quantity: 1, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 2, Name: '2', Length: 13.5, Width: 10.4, Height: 12.7, Quantity: 1, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 4, Name: '4', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 8, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 5, Name: '5', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 7, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 6, Name: '6', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 7, Name: '7', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 8, IsStackable: true }));
+
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 32, Name: '32', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 33, Name: '33', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 34, Name: '34', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 29, Name: '29', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 30, Name: '30', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 3, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 26, Name: '26', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 27, Name: '27', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 28, Name: '28', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 31, Name: '31', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 22, Name: '22', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 18, Name: '18', Length: 13.5, Width: 10.4, Height: 12.7, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 19, Name: '19', Length: 13.5, Width: 10.4, Height: 12.7, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 20, Name: '20', Length: 13.5, Width: 10.4, Height: 12.7, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 21, Name: '21', Length: 13.5, Width: 10.4, Height: 12.7, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 23, Name: '23', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 24, Name: '24', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 25, Name: '25', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
+
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 47, Name: '47', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 46, Name: '46', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 43, Name: '43', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 44, Name: '44', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 45, Name: '45', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 48, Name: '48', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 2, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 49, Name: '49', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 2, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 50, Name: '50', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 2, IsStackable: true }));
+
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 68, Name: '68', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 5, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 67, Name: '67', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 69, Name: '69', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 71, Name: '71', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 2, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 70, Name: '70', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 72, Name: '72', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 1, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 64, Name: '64', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 65, Name: '65', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 66, Name: '66', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 63, Name: '63', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
+
+		//----------------------------------------------------------------------------------------------------------------------------------------
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 90, Name: '90', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 7, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 77, Name: '77', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 3, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 89, Name: '89', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 86, Name: '86', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 87, Name: '87', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 88, Name: '88', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 91, Name: '91', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 3, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 92, Name: '92', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 3, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 93, Name: '93', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 2, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 82, Name: '82', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 94, Name: '94', Length: 17.8, Width: 12.2, Height: 8.6, Quantity: 3, IsStackable: true }));
+		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 83, Name: '83', Length: 12.2, Width: 11.4, Height: 8.6, Quantity: 6, IsStackable: true }));
 	};
-	
 	self.GenerateContainers = function () {
 		self.Containers([]);
-		self.Containers.push(ko.mapping.fromJS({ ID: 1000, Name: 'Box1', Length: 15, Width: 13, Height: 9, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1001, Name: 'Box2', Length: 23, Width: 9, Height: 4, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1002, Name: 'Box3', Length: 16, Width: 16, Height: 6, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1003, Name: 'Box4', Length: 10, Width: 8, Height: 5, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1004, Name: 'Box5', Length: 40, Width: 28, Height: 20, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1005, Name: 'Box6', Length: 29, Width: 19, Height: 4, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1006, Name: 'Box7', Length: 18, Width: 13, Height: 1, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1007, Name: 'Box8', Length: 6, Width: 6, Height: 6, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1008, Name: 'Box9', Length: 8, Width: 5, Height: 5, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1009, Name: 'Box10', Length: 18, Width: 13, Height: 8, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1010, Name: 'Box11', Length: 17, Width: 16, Height: 15, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1011, Name: 'Box12', Length: 32, Width: 10, Height: 9, AlgorithmPackingResults: [] }));
-		self.Containers.push(ko.mapping.fromJS({ ID: 1012, Name: 'Box13', Length: 60, Width: 60, Height: 60, AlgorithmPackingResults: [] }));
+		self.Containers.push(ko.mapping.fromJS({ ID: 1000, Name: 'Trailer', Length: 161.5, Width: 25.9, Height: 27.4, AlgorithmPackingResults: [] }));
 	};
 
 	self.AddAlgorithmToUse = function () {
