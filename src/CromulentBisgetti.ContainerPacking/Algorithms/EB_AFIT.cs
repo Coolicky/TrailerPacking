@@ -377,7 +377,7 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 
 				if (currentItem.IsPacked) continue;
 				if (IsOverlapping(currentItem)) continue;
-				if (!currentItem.CanBeStackedOnTop && packedHeight != 0) continue;
+				if (!currentItem.IsStackable && packedHeight != 0) continue;
 
 				AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Length, currentItem.Height, currentItem.Depth);
 				AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Depth, currentItem.Height, currentItem.Length);

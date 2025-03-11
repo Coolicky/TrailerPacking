@@ -67,7 +67,6 @@ public record Item
 	public decimal Volume { get; }
 	public bool IsStackable { get; set; } = false;
 	public bool CanBePlacedOnSide { get; set; } = false;
-	public bool CanBeStackedOnTop { get; set; } = true;
 }
 public class RequestItem
 {
@@ -134,5 +133,4 @@ public class RequestItem
 	public decimal Volume { get; }
 	public bool IsStackable { get; set; } = false;
 	public bool CanBePlacedOnSide { get; set; } = false;
-	public bool CanBeStackedOnTop { get; set; } = true;
 }
