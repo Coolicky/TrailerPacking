@@ -19,7 +19,7 @@ namespace CromulentBisgetti.DemoApp.Controllers
             var items = new List<Item>();
             foreach (var requestItem in request.ItemsToPack)
             {
-                items.Add(new Item(Guid.NewGuid(), requestItem.Dim1, requestItem.Dim2, requestItem.Dim3, requestItem.Quantity, requestItem.IsStackable));
+                items.Add(new Item(Guid.NewGuid(), requestItem.Dim1, requestItem.Dim2, requestItem.Dim3, requestItem.Quantity, requestItem.IsStackable, requestItem.Weight, requestItem.MaxStack));
             }
             return new List<ContainerPackingResult>()
             {

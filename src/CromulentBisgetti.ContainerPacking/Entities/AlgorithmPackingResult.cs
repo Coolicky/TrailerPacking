@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace CromulentBisgetti.ContainerPacking.Entities;
 
@@ -13,4 +14,7 @@ public record AlgorithmPackingResult
 	public List<Item> PackedItems { get; set; } = [];
 	public List<Item> UnpackedItems { get; set; } = [];
 	public Container Container { get; set; }
+
+	public decimal TotalWeightPacked => PackedItems.Sum(i => i.Weight);
+	public decimal PercentageWeightPacked => TotalWeightPacked * 100 / Container.MaxWeight;
 }

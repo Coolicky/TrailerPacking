@@ -180,27 +180,27 @@ var ViewModel = function () {
 		// self.ItemsToPack.push(ko.mapping.fromJS({ ID: 21, Name: '21', Length: 11.43, Width: 11.04, Height: 12.2, Quantity: 1, IsStackable: true }));
 
 		//----------------------------------------------------------------------------------------------------------------------------------------
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 0, Name: '0', Length: 11.43, Width: 11.3, Height: 12.2, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1, Name: '1', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 2, Name: '2', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 3, Name: '3', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 4, Name: '4', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 4, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 5, Name: '5', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 3, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 6, Name: '6', Length: 12.19, Width: 8.64, Height: 16.38, Quantity: 6, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 7, Name: '7', Length: 12.19, Width: 8.64, Height: 16.38, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 8, Name: '8', Length: 11.43, Width: 12.58, Height: 12.2, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 9, Name: '9', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 7, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 10, Name: '10', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 7, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 11, Name: '11', Length: 7.62, Width: 6.35, Height: 8.13, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 12, Name: '12', Length: 7.62, Width: 6.35, Height: 8.13, Quantity: 3, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 13, Name: '13', Length: 11.43, Width: 12.58, Height: 12.2, Quantity: 1, IsStackable: true }));
-		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 14, Name: '14', Length: 11.43, Width: 6.35, Height: 12.2, Quantity: 3, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 0, Name: '0', Length: 11.43, Width: 11.3, Height: 12.2, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 1, Name: '1', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 2, Name: '2', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 3, Name: '3', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 4, Name: '4', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 4, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 5, Name: '5', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 3, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 6, Name: '6', Length: 12.19, Width: 8.64, Height: 16.38, Quantity: 6, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 7, Name: '7', Length: 12.19, Width: 8.64, Height: 16.38, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 8, Name: '8', Length: 11.43, Width: 12.58, Height: 12.2, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 9, Name: '9', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 7, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 10, Name: '10', Length: 11.43, Width: 8.64, Height: 12.2, Quantity: 7, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 11, Name: '11', Length: 7.62, Width: 6.35, Height: 8.13, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 12, Name: '12', Length: 7.62, Width: 6.35, Height: 8.13, Quantity: 3, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 13, Name: '13', Length: 11.43, Width: 12.58, Height: 12.2, Quantity: 1, Weight: 1000, MaxStack: 0, IsStackable: true }));
+		self.ItemsToPack.push(ko.mapping.fromJS({ ID: 14, Name: '14', Length: 11.43, Width: 6.35, Height: 12.2, Quantity: 3, Weight: 1000, MaxStack: 0, IsStackable: true }));
 
 
 	};
 	self.GenerateContainers = function () {
 		self.Containers([]);
-		self.Containers.push(ko.mapping.fromJS({ ID: 1000, Name: 'Trailer', Length: 161.5, Width: 25.9, Height: 27.4, AlgorithmPackingResults: [] }));
+		self.Containers.push(ko.mapping.fromJS({ ID: 1000, Name: 'Trailer', Length: 161.5, Width: 25.9, Height: 27.4, MaxWeight: 19300, AlgorithmPackingResults: [] }));
 	};
 
 	self.AddAlgorithmToUse = function () {
@@ -222,6 +222,8 @@ var ViewModel = function () {
 		self.NewItemToPack.Height('');
 		self.NewItemToPack.Quantity('');
 		self.NewItemToPack.IsStackable(true);
+		self.NewItemToPack.Weight('');
+		self.NewItemToPack.MaxStack('');
 	};
 
 	self.RemoveItemToPack = function (item) {
@@ -257,7 +259,9 @@ var ViewModel = function () {
 				Dim2: item.Width(),
 				Dim3: item.Height(),
 				Quantity: item.Quantity(),
-				IsStackable: item.IsStackable()
+				IsStackable: item.IsStackable(),
+				Weight: item.Weight(),
+				MaxStack: item.MaxStack()
 			};
 			
 			itemsToPack.push(itemToPack);
@@ -271,7 +275,8 @@ var ViewModel = function () {
 				ID: container.ID(),
 				Length: container.Length(),
 				Width: container.Width(),
-				Height: container.Height()
+				Height: container.Height(),
+				MaxWeight: container.MaxWeight()
 			};
 
 			containers.push(containerToUse);
@@ -371,9 +376,11 @@ var ItemToPack = function () {
 	this.Name = '';
 	this.Length = '';
 	this.Width = '';
-	this.Height = '',
+	this.Height = '';
 	this.Quantity = '';
 	this.IsStackable = true;
+	this.Weight = '';
+	this.MaxStack = '';
 }
 
 var Container = function () {
@@ -382,6 +389,7 @@ var Container = function () {
 	this.Length = '';
 	this.Width = '';
 	this.Height = '';
+	this.MaxWeight = '';
 	this.AlgorithmPackingResults = [];
 }
 

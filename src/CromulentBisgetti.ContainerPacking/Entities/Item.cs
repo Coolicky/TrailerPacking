@@ -4,7 +4,7 @@ namespace CromulentBisgetti.ContainerPacking.Entities;
 
 public record Item
 {
-	public Item(Guid id, decimal length, decimal height, decimal depth, int quantity, bool isStackable)
+	public Item(Guid id, decimal length, decimal height, decimal depth, int quantity, bool isStackable, decimal weight, int? maxStack)
 	{
 		ID = id;
 		Length = length;
@@ -13,6 +13,8 @@ public record Item
 		Volume = length * height * depth;
 		Quantity = quantity;
 		IsStackable = isStackable;
+		Weight = weight;
+		MaxStack = maxStack > 0 ? maxStack : null;
 	}
 
 	public Guid ID { get; set; }
@@ -66,10 +68,14 @@ public record Item
 	public decimal PackDimZ { get; set; }
 	public decimal Volume { get; }
 	public bool IsStackable { get; set; } = false;
+	public decimal Weight { get; set; }
+	public int? MaxStack { get; set; }
+	public bool? IsCombined { get; set; }
+	public Guid? CombinedItemId { get; set; }
 }
 public class RequestItem
 {
-	public RequestItem(int id, decimal dim1, decimal dim2, decimal dim3, int quantity, bool isStackable)
+	public RequestItem(int id, decimal dim1, decimal dim2, decimal dim3, int quantity, bool isStackable, decimal weight, int maxStack)
 	{
 		ID = id;
 		Dim1 = dim1;
@@ -78,6 +84,8 @@ public class RequestItem
 		Volume = dim1 * dim2 * dim3;
 		Quantity = quantity;
 		IsStackable = isStackable;
+		Weight = weight;
+		MaxStack = maxStack;
 	}
 
 	public int ID { get; set; }
@@ -131,4 +139,6 @@ public class RequestItem
 	public decimal PackDimZ { get; set; }
 	public decimal Volume { get; }
 	public bool IsStackable { get; set; } = false;
+	public decimal Weight { get; set; }
+	public int MaxStack { get; set; }
 }

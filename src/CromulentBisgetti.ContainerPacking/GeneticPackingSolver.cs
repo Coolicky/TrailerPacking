@@ -13,7 +13,8 @@ public static class GeneticPackingSolver
 {
     public static AlgorithmPackingResult Hello(Container container, List<Item> itemsToPack)
     {
-        var totalItems = itemsToPack.Sum(i => i.Quantity);
+        itemsToPack = GroupByStacking(itemsToPack, container);
+
         var dims = new List<decimal>();
         foreach (var item in itemsToPack)
         {
@@ -44,11 +45,23 @@ public static class GeneticPackingSolver
             results.Add(PackForContainer(container, itemsToPack, dim, dims.ToArray()));
         });
         
+        results.ForEach(r => UngroupStacking(r, itemsToPack));
+        
         var bestResult = results
             .OrderByDescending(r => r.PercentContainerVolumePacked)
+            .ThenByDescending(r => r.PercentageWeightPacked)
+            .ThenByDescending(r => r.PackedItems.Count)
             .First();
 
         stopwatch.Stop();
+
+        foreach (var result in results
+                     .OrderByDescending(r => r.PercentContainerVolumePacked)
+                     .ThenByDescending(r => r.PercentageWeightPacked)
+                     .ThenByDescending(r => r.PackedItems.Count))
+        {
+            Log.Logger.Warning($"{result.PercentContainerVolumePacked} | {result.PercentageWeightPacked} | {result.PackedItems.Count}");
+        }
         
         bestResult.PackTimeInMilliseconds = stopwatch.ElapsedMilliseconds;
 
@@ -71,10 +84,142 @@ public static class GeneticPackingSolver
             }
         }
         bestResult.UnpackedItems = unpacked;
-
-        var total = bestResult.PackedItems.Count + bestResult.UnpackedItems.Count;
-        
         return bestResult;
+    }
+
+    private static void UngroupStacking(AlgorithmPackingResult result, List<Item> originalItems)
+    {
+        var packed = result.PackedItems;
+        var unpacked = result.UnpackedItems;
+
+        var packedGrouped = packed.Where(r => r.IsCombined == true).ToList();
+        var unpackedGrouped = unpacked.Where(r => r.IsCombined == true).ToList();
+
+        foreach (var item in packedGrouped)
+        {
+            var originalItem = originalItems
+                .First(r => r.ID == item.CombinedItemId);
+
+            var quantity = item.Height / originalItem.Height;
+            originalItem.Quantity += (int)quantity;
+
+            var index = packed.IndexOf(item);
+            
+            for (var i = 0; i < quantity; i++)
+            {
+                var newItem = originalItem with
+                {
+                    ID = originalItem.ID,
+                    Quantity = 1,
+                    Height = originalItem.Height,
+                    CoordX = item.CoordX,
+                    CoordZ = item.CoordZ,
+                    CoordY = item.CoordY + (i * originalItem.Height),
+                    PackDimX = item.PackDimX,
+                    PackDimZ = item.PackDimZ,
+                    PackDimY = originalItem.Height,
+                    Weight = originalItem.Weight,
+                    IsCombined = true,
+                };
+                packed.Insert(index + i, newItem);
+            }
+            packed.Remove(item);
+        }
+
+        foreach (var item in unpackedGrouped)
+        {
+            var originalItem = originalItems
+                .First(r => r.ID == item.CombinedItemId);
+
+            var quantity = item.Height / originalItem.Height;
+            originalItem.Quantity += (int)quantity;
+
+            var index = unpacked.IndexOf(item);
+            
+            for (var i = 0; i < quantity; i++)
+            {
+                var newItem = originalItem with
+                {
+                    ID = originalItem.ID,
+                    Quantity = 1,
+                    Height = originalItem.Height,
+                    CoordX = item.CoordX,
+                    CoordZ = item.CoordZ,
+                    CoordY = item.CoordY + (i * originalItem.Height),
+                    PackDimX = item.PackDimX,
+                    PackDimZ = item.PackDimZ,
+                    PackDimY = originalItem.Height,
+                    IsCombined = true,
+                };
+                unpacked.Insert(index + i, newItem);
+            }
+            unpacked.Remove(item);
+        }
+    }
+
+    private static List<Item> GroupByStacking(List<Item> itemsToPack, Container container)
+    {
+        var items = new List<Item>(itemsToPack);
+        foreach (var item in itemsToPack)
+        {
+            if (item.MaxStack == 1)
+                item.IsStackable = false;
+            if (!item.IsStackable) continue;
+
+            if (item.MaxStack == null) continue;
+            if (item.MaxStack < 2) continue;
+            if (item.Quantity < 2) continue;
+            if (item.Height * 2 > container.Height) continue;
+
+            var maxStack = item.MaxStack.Value;
+            if (maxStack * item.Height > container.Height)
+                maxStack = (int)(container.Height / item.Height);
+
+            var newId = Guid.NewGuid();
+            while (item.Quantity > 0)
+            {
+                if (item.Quantity == 1)
+                {
+                    break;
+                }
+                if (item.Quantity < maxStack)
+                {
+                    var smallId = Guid.NewGuid();
+                    items.Add(item with
+                    {
+                        ID = smallId,
+                        IsCombined = true,
+                        Height = item.Height * item.Quantity,
+                        Weight = item.Weight * item.Quantity,
+                        CombinedItemId = item.ID,
+                        IsStackable = false,
+                        Quantity = 1,
+                    });
+                    break;
+                }
+                else
+                {
+                    items.Add(item with
+                    {
+                        ID = newId,
+                        IsCombined = true,
+                        Height = item.Height * maxStack,
+                        Weight = item.Weight * maxStack,
+                        CombinedItemId = item.ID,
+                        IsStackable = false,
+                        Quantity = 1,
+                    });
+                    item.Quantity -= maxStack;
+                }
+            }
+        }
+        return items
+            .GroupBy(r => r.ID)
+            .Select(r => r.First() with
+            {
+                Quantity = r.Sum(x => x.Quantity)
+            })
+            .Where(r => r.Quantity > 0).ToList();
     }
 
     private static AlgorithmPackingResult PackForContainer(
@@ -87,12 +232,13 @@ public static class GeneticPackingSolver
         var currentX = 0M;
         var result = new AlgorithmPackingResult
         {
+            Container = container,
             PackedItems = [],
             UnpackedItems = new List<Item>(items),
         };
 
         if (dim > container.Length) return result;
-        var newContainer = new Container(0, dim, container.Width, container.Height);
+        var newContainer = new Container(0, dim, container.Width, container.Height, container.MaxWeight);
         var firstPack = new EB_AFIT().Run(newContainer, items);
 
         if (firstPack.PackedItems.Count == 0) return result;
@@ -118,12 +264,24 @@ public static class GeneticPackingSolver
         return result;
     }
 
-    private static void RecursivelyPackItems(Container trailer,
+    private static void RecursivelyPackItems(
+        Container trailer,
         decimal[] dims,
         decimal currentX,
         AlgorithmPackingResult result,
         AlgorithmPackingResult previousPack)
     {
+        if (result.TotalWeightPacked >= trailer.MaxWeight)
+        {
+            while (result.TotalWeightPacked > trailer.MaxWeight)
+            {
+                var last = result.PackedItems.Last();
+                result.PackedItems.Remove(last);
+                result.UnpackedItems.Add(last);
+            }
+            return;
+        }
+
         if (result.UnpackedItems.Count == 0) return;
 
         var remainingLength = trailer.Length - currentX;
@@ -173,7 +331,7 @@ public static class GeneticPackingSolver
         foreach (var proposedDim in dims)
         {
             if (proposedDim > remainingLength) continue;
-            var container = new Container(0, proposedDim, trailer.Width, trailer.Height);
+            var container = new Container(0, proposedDim, trailer.Width, trailer.Height, trailer.MaxWeight);
             if (remainingLength - proposedDim < proposedDim)
                 container.Length = remainingLength;
             var packingResult = new EB_AFIT().Run(container, itemsToPack);
