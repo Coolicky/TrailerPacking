@@ -66,7 +66,6 @@ public record Item
 	public decimal PackDimZ { get; set; }
 	public decimal Volume { get; }
 	public bool IsStackable { get; set; } = false;
-	public bool CanBePlacedOnSide { get; set; } = false;
 }
 public class RequestItem
 {
@@ -132,5 +131,4 @@ public class RequestItem
 	public decimal PackDimZ { get; set; }
 	public decimal Volume { get; }
 	public bool IsStackable { get; set; } = false;
-	public bool CanBePlacedOnSide { get; set; } = false;
 }

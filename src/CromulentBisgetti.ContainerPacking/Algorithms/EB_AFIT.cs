@@ -386,13 +386,13 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				    currentItem.Depth == currentItem.Height)
 					continue;
 
-				if (item.CanBePlacedOnSide)
-				{
-					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Length, currentItem.Depth, currentItem.Height);
-					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Height, currentItem.Length, currentItem.Depth);
-					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Height, currentItem.Depth, currentItem.Length);
-					AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Depth, currentItem.Length, currentItem.Height);
-				}
+				// if (item.CanBePlacedOnSide)
+				// {
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Length, currentItem.Depth, currentItem.Height);
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Height, currentItem.Length, currentItem.Depth);
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Height, currentItem.Depth, currentItem.Length);
+					// AnalyzeBox(hmx, hy, hmy, hz, hmz, currentItem.Depth, currentItem.Length, currentItem.Height);
+				// }
 			}
 		}
 
@@ -555,45 +555,45 @@ namespace CromulentBisgetti.ContainerPacking.Algorithms
 				}
 			}
 
-			foreach (var group in items
-				         .Where(r => r.CanBePlacedOnSide)
-				         .GroupBy(r => r.Length))
-			{
-				dims.Add(group.Key);
-				if (group.Count() > 1)
-				{
-					var dist = 0.001M;
-					foreach (var item in group)
-					{
-						while (dims.Contains(item.Length))
-						{
-							item.Length -= dist;
-							dist += 0.001M;
-						}
-						dims.Add(item.Length);
-					}
-				}
-			}
-
-			foreach (var group in items
-				         .Where(r => r.CanBePlacedOnSide)
-				         .GroupBy(r => r.Depth))
-			{
-				dims.Add(group.Key);
-				if (group.Count() > 1)
-				{
-					var dist = 0.001M;
-					foreach (var item in group)
-					{
-						while (dims.Contains(item.Depth))
-						{
-							item.Depth -= dist;
-							dist += 0.001M;
-						}
-						dims.Add(item.Depth);
-					}
-				}
-			}
+			// foreach (var group in items
+			// 	         .Where(r => r.CanBePlacedOnSide)
+			// 	         .GroupBy(r => r.Length))
+			// {
+			// 	dims.Add(group.Key);
+			// 	if (group.Count() > 1)
+			// 	{
+			// 		var dist = 0.001M;
+			// 		foreach (var item in group)
+			// 		{
+			// 			while (dims.Contains(item.Length))
+			// 			{
+			// 				item.Length -= dist;
+			// 				dist += 0.001M;
+			// 			}
+			// 			dims.Add(item.Length);
+			// 		}
+			// 	}
+			// }
+			//
+			// foreach (var group in items
+			// 	         .Where(r => r.CanBePlacedOnSide)
+			// 	         .GroupBy(r => r.Depth))
+			// {
+			// 	dims.Add(group.Key);
+			// 	if (group.Count() > 1)
+			// 	{
+			// 		var dist = 0.001M;
+			// 		foreach (var item in group)
+			// 		{
+			// 			while (dims.Contains(item.Depth))
+			// 			{
+			// 				item.Depth -= dist;
+			// 				dist += 0.001M;
+			// 			}
+			// 			dims.Add(item.Depth);
+			// 		}
+			// 	}
+			// }
 		}
 
 		/// <summary>
