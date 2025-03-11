@@ -20,6 +20,7 @@ public static class GeneticPackingSolver
             dims.Add(item.Length);
             dims.Add(item.Depth);
         }
+        dims = dims.Distinct().ToList();
         var secondaryDims = new List<decimal>();
         foreach (var dim in dims)
         {
@@ -30,7 +31,7 @@ public static class GeneticPackingSolver
         }
         dims = dims
             .Concat(secondaryDims)
-            .Distinct()
+            .DistinctWithTolerance(1M)
             .OrderByDescending(r => r)
             .ToList();
 
