@@ -11,10 +11,15 @@ public static class Extensions
         var distinctItems = new List<decimal>();
         foreach (var item in source)
         {
-            if (distinctItems.All(distinctItem => Math.Abs(item - distinctItem) >= tolerance))
+            if (distinctItems.All(distinctItem => distinctItem.EqualsWithTolerance(item, tolerance)))
                 distinctItems.Add(item);
         }
 
         return distinctItems;
+    }
+
+    public static bool EqualsWithTolerance(this decimal source, decimal other, decimal tolerance)
+    {
+        return Math.Abs(source - other) >= tolerance;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using CromulentBisgetti.ContainerPacking.Algorithms;
 using CromulentBisgetti.ContainerPacking.Entities;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -54,14 +53,6 @@ public static class GeneticPackingSolver
             .First();
 
         stopwatch.Stop();
-
-        foreach (var result in results
-                     .OrderByDescending(r => r.PercentContainerVolumePacked)
-                     .ThenByDescending(r => r.PercentageWeightPacked)
-                     .ThenByDescending(r => r.PackedItems.Count))
-        {
-            Log.Logger.Warning($"{result.PercentContainerVolumePacked} | {result.PercentageWeightPacked} | {result.PackedItems.Count}");
-        }
         
         bestResult.PackTimeInMilliseconds = stopwatch.ElapsedMilliseconds;
 
@@ -240,6 +231,7 @@ public static class GeneticPackingSolver
         if (dim > container.Length) return result;
         var newContainer = new Container(0, dim, container.Width, container.Height, container.MaxWeight);
         var firstPack = new EB_AFIT().Run(newContainer, items);
+        OptimizeResult(firstPack);
 
         if (firstPack.PackedItems.Count == 0) return result;
         
@@ -294,15 +286,15 @@ public static class GeneticPackingSolver
             previousPack.PackedItems.Select(r => r.PackDimX).Max() <= remainingLength)
         {
             bestResult = matchingNextPack;
-            Log.Logger.Warning("Picking best result!!!!");
         }
         else
         {
-            Log.Logger.Warning("Calculating from remaining.....");
             bestResult = CalculateBestResult(dims, remainingLength, trailer, result.UnpackedItems);
         }
         if (bestResult is null) return;
         if (bestResult.PackedItems.Count == 0) return;
+
+        OptimizeResult(bestResult);
 
         var maxX = bestResult.PackedItems.Max(r => r.CoordX + r.PackDimX);
         foreach (var packedItem in bestResult.PackedItems)
@@ -319,6 +311,61 @@ public static class GeneticPackingSolver
 
         currentX += maxX;
         RecursivelyPackItems(trailer, dims, currentX, result, bestResult);
+    }
+
+    private static void OptimizeResult(AlgorithmPackingResult result)
+    {
+        RearrangeLayers(result);
+        DropFloatingItems(result);
+    }
+
+    private static void RearrangeLayers(AlgorithmPackingResult result)
+    {
+        if (result.PackedItems.Select(r => r.Height).DistinctWithTolerance(0.1M).Count() == 1) return;
+        var layers = result.PackedItems
+            .GroupBy(r => r.CoordY)
+            .OrderBy(r => r.Select(i => i.PackDimY).DistinctWithTolerance(0.1M).Count())
+            .ThenByDescending(r => r.Select(i => i.Volume).Sum())
+            .ToList();
+
+        var items = new List<Item>();
+        var height = 0M;
+        foreach (var layer in layers)
+        {
+            var layerHeight = layer.Select(r => r.PackDimY).Max();
+            foreach (var item in layer)
+            {
+                items.Add(item with
+                {
+                    CoordY = height,
+                });
+            }
+            height += layerHeight;
+        }
+        result.PackedItems = items;
+    }
+
+    private static void DropFloatingItems(AlgorithmPackingResult result)
+    {
+        foreach (var item in result.PackedItems)
+        {
+            if (item.CoordY == 0) continue;
+            var coords = new BoxCoords(item);
+            var itemsBelow = result
+                .PackedItems
+                .Where(r => r.CoordY < item.CoordY)
+                .Where(r => coords.OverlapsXZ(r))
+                .ToList();
+            if (!itemsBelow.Any())
+            {
+                item.CoordY = 0;
+                return;
+            }
+            var maxBelow = itemsBelow.Select(r => r.CoordY + r.PackDimY)
+                .Max();
+            if (maxBelow.EqualsWithTolerance(item.CoordY, 0.1M))
+                item.CoordY = maxBelow;
+        }
     }
 
     private static AlgorithmPackingResult CalculateBestResult(
@@ -341,6 +388,8 @@ public static class GeneticPackingSolver
         if (results.Count == 0) return null;
         return results
             .OrderByDescending(r => r.PercentContainerVolumePacked)
+            .ThenByDescending(r => r.PercentageWeightPacked)
+            .ThenByDescending(r => r.PackedItems.Count)
             .First();
     }
     
@@ -352,11 +401,15 @@ public static class GeneticPackingSolver
         };
         foreach (var packedItem in previousPack.PackedItems)
         {
-            var item = previousPack.UnpackedItems
-                .FirstOrDefault(r =>
-                    Math.Abs(r.Height - packedItem.Height) < 0.01M &&
-                    r.Depth == packedItem.Depth &&
-                    r.Length == packedItem.Length);
+            var item = previousPack.UnpackedItems.FirstOrDefault(r => r.ID == packedItem.ID);
+            if (item == null)
+            {
+                item = previousPack.UnpackedItems
+                    .FirstOrDefault(r =>
+                        Math.Abs(r.Height - packedItem.Height) < 0.01M &&
+                        r.Depth == packedItem.Depth &&
+                        r.Length == packedItem.Length);
+            }
             if (item == null) return null;
 
             var newItem = packedItem with
