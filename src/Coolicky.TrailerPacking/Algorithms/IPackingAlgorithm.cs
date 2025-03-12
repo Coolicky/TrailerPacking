@@ -1,7 +1,7 @@
-﻿using CromulentBisgetti.ContainerPacking.Entities;
+﻿using Coolicky.TrailerPacking.Entities;
 using System.Collections.Generic;
 
-namespace CromulentBisgetti.ContainerPacking.Algorithms;
+namespace Coolicky.TrailerPacking.Algorithms;
 
 public interface IPackingAlgorithm
 {

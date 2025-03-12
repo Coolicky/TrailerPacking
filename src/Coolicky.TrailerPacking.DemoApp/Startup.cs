@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace CromulentBisgetti.DemoApp
+namespace Coolicky.TrailerPacking.DemoApp
 {
     public class Startup
     {

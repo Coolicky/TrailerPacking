@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace CromulentBisgetti.DemoApp
+namespace Coolicky.TrailerPacking.DemoApp
 {
     public class Program
     {

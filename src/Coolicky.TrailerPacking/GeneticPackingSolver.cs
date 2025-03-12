@@ -1,17 +1,18 @@
-﻿using CromulentBisgetti.ContainerPacking.Algorithms;
-using CromulentBisgetti.ContainerPacking.Entities;
+﻿using Coolicky.TrailerPacking.Algorithms;
+using Coolicky.TrailerPacking.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CromulentBisgetti.ContainerPacking;
+namespace Coolicky.TrailerPacking;
 
 public static class GeneticPackingSolver
 {
     public static AlgorithmPackingResult Hello(Container container, List<Item> itemsToPack)
     {
+        var originalItems = itemsToPack.Select(r => r with{}).ToList();
         itemsToPack = GroupByStacking(itemsToPack, container);
 
         var dims = new List<decimal>();
@@ -44,7 +45,7 @@ public static class GeneticPackingSolver
             results.Add(PackForContainer(container, itemsToPack, dim, dims.ToArray()));
         });
         
-        results.ForEach(r => UngroupStacking(r, itemsToPack));
+        results.ForEach(r => UngroupStacking(r, originalItems));
         
         var bestResult = results
             .OrderByDescending(r => r.PercentContainerVolumePacked)

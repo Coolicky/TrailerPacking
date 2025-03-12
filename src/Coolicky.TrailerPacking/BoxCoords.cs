@@ -1,6 +1,6 @@
-﻿using CromulentBisgetti.ContainerPacking.Entities;
+﻿using Coolicky.TrailerPacking.Entities;
 
-namespace CromulentBisgetti.ContainerPacking;
+namespace Coolicky.TrailerPacking;
 
 public struct BoxCoords
 {

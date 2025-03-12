@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CromulentBisgetti.ContainerPacking.Algorithms;
+namespace Coolicky.TrailerPacking.Algorithms;
 
 public enum AlgorithmType
 {

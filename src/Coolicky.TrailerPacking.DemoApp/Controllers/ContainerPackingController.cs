@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using CromulentBisgetti.ContainerPacking;
-using CromulentBisgetti.ContainerPacking.Entities;
-using CromulentBisgetti.DemoApp.Models;
+﻿using Coolicky.TrailerPacking.DemoApp.Models;
+using Coolicky.TrailerPacking.Entities;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 
-namespace CromulentBisgetti.DemoApp.Controllers
+namespace Coolicky.TrailerPacking.DemoApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

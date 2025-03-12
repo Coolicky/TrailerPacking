@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CromulentBisgetti.ContainerPacking.Entities;
+namespace Coolicky.TrailerPacking.Entities;
 
 public record Item
 {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CromulentBisgetti.ContainerPacking.Entities;
+namespace Coolicky.TrailerPacking.Entities;
 
 public class ContainerPackingResult
 {

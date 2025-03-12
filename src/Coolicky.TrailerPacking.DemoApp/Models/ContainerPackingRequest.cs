@@ -1,7 +1,7 @@
-﻿using CromulentBisgetti.ContainerPacking.Entities;
+﻿using Coolicky.TrailerPacking.Entities;
 using System.Collections.Generic;
 
-namespace CromulentBisgetti.DemoApp.Models
+namespace Coolicky.TrailerPacking.DemoApp.Models
 {
 	public class ContainerPackingRequest
 	{

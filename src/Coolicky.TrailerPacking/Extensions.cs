@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CromulentBisgetti.ContainerPacking;
+namespace Coolicky.TrailerPacking;
 
 public static class Extensions
 {

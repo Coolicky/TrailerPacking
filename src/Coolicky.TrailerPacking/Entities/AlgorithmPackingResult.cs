@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CromulentBisgetti.ContainerPacking.Entities;
+namespace Coolicky.TrailerPacking.Entities;
 
 public record AlgorithmPackingResult
 {

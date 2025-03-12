@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace CromulentBisgetti.DemoApp.Controllers
+namespace Coolicky.TrailerPacking.DemoApp.Controllers
 {
     public class HomeController : Controller
     {

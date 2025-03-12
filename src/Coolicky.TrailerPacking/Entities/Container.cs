@@ -1,4 +1,4 @@
-﻿namespace CromulentBisgetti.ContainerPacking.Entities;
+﻿namespace Coolicky.TrailerPacking.Entities;
 
 public record Container
 {

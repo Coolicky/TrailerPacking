@@ -1,12 +1,12 @@
-﻿using CromulentBisgetti.ContainerPacking.Algorithms;
-using CromulentBisgetti.ContainerPacking.Entities;
+﻿using Coolicky.TrailerPacking.Algorithms;
+using Coolicky.TrailerPacking.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CromulentBisgetti.ContainerPacking;
+namespace Coolicky.TrailerPacking;
 
 public static class PackingService
 {
