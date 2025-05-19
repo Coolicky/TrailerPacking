@@ -3,10 +3,12 @@ using System.Linq;
 
 namespace Coolicky.TrailerPacking.Entities;
 
-public record AlgorithmPackingResult
+/// <summary>
+/// Represents the result of a packing operation, including details about packed and unpacked items,
+/// efficiency metrics, and the associated container.
+/// </summary>
+public record PackingResult
 {
-	public int AlgorithmID { get; set; }
-	public string AlgorithmName { get; set; }
 	public bool IsCompletePack { get; set; }
 	public long PackTimeInMilliseconds { get; set; }
 	public decimal PercentContainerVolumePacked { get; set; }

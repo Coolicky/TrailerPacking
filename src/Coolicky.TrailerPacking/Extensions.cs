@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Coolicky.TrailerPacking;
 
-public static class Extensions
+internal static class Extensions
 {
-    public static IEnumerable<decimal> DistinctWithTolerance(this IEnumerable<decimal> source, decimal tolerance)
+    internal static IEnumerable<decimal> DistinctWithTolerance(this IEnumerable<decimal> source, decimal tolerance)
     {
         var distinctItems = new List<decimal>();
         foreach (var item in source)
@@ -18,7 +18,7 @@ public static class Extensions
         return distinctItems;
     }
 
-    public static bool EqualsWithTolerance(this decimal source, decimal other, decimal tolerance)
+    internal static bool EqualsWithTolerance(this decimal source, decimal other, decimal tolerance)
     {
         return Math.Abs(source - other) >= tolerance;
     }

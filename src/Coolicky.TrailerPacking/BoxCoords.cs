@@ -2,7 +2,14 @@
 
 namespace Coolicky.TrailerPacking;
 
-public struct BoxCoords
+/// <summary>
+/// Represents a set of coordinates that define the bounding box of an item in 3D space.
+/// </summary>
+/// <remarks>
+/// This struct is used to calculate and manage the boundaries of an item in a packing system.
+/// It provides methods to check for overlap between bounding boxes in the XZ plane.
+/// </remarks>
+public readonly struct BoxCoords
 {
     public BoxCoords(Item item)
     {

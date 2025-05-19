@@ -8,9 +8,20 @@ using System.Threading.Tasks;
 
 namespace Coolicky.TrailerPacking;
 
-public static class GeneticPackingSolver
+public interface IPackingSolver
 {
-    public static AlgorithmPackingResult Hello(Container container, List<Item> itemsToPack)
+    /// <summary>
+    /// Attempts to pack items into a specified container using a genetic algorithm-based approach.
+    /// </summary>
+    /// <param name="container">The container into which items will be packed. Contains dimensions and weight limit.</param>
+    /// <param name="itemsToPack">List of items that need to be packed, each with dimensions, weight, and packing attributes.</param>
+    /// <returns>Returns a <see cref="PackingResult"/> object containing details about the packing operation, such as packed items, unpacked items, and statistics on the packing efficiency.</returns>
+    PackingResult Pack(Container container, List<Item> itemsToPack);
+}
+
+public class GeneticPackingSolver : IPackingSolver
+{
+    public PackingResult Pack(Container container, List<Item> itemsToPack)
     {
         var originalItems = itemsToPack.Select(r => r with{}).ToList();
         itemsToPack = GroupByStacking(itemsToPack, container);
@@ -39,7 +50,7 @@ public static class GeneticPackingSolver
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        var results = new List<AlgorithmPackingResult>();
+        var results = new List<PackingResult>();
         Parallel.ForEach(dims, dim =>
         {
             results.Add(PackForContainer(container, itemsToPack, dim, dims.ToArray()));
@@ -64,22 +75,10 @@ public static class GeneticPackingSolver
         bestResult.PercentContainerVolumePacked = Math.Round(itemVolumePacked / containerVolume * 100, 2);
         bestResult.PercentItemVolumePacked = Math.Round(itemVolumePacked / (itemVolumePacked + itemVolumeUnpacked) * 100, 2);
 
-        var unpacked = new List<Item>();
-        foreach (var unpackedItem in bestResult.UnpackedItems)
-        {
-            for (var i = 0; i < unpackedItem.Quantity; i++)
-            {
-                unpacked.Add(unpackedItem with
-                {
-                    Quantity = 1,
-                });
-            }
-        }
-        bestResult.UnpackedItems = unpacked;
         return bestResult;
     }
 
-    private static void UngroupStacking(AlgorithmPackingResult result, List<Item> originalItems)
+    private static void UngroupStacking(PackingResult result, List<Item> originalItems)
     {
         var packed = result.PackedItems;
         var unpacked = result.UnpackedItems;
@@ -90,7 +89,7 @@ public static class GeneticPackingSolver
         foreach (var item in packedGrouped)
         {
             var originalItem = originalItems
-                .First(r => r.ID == item.CombinedItemId);
+                .First(r => r.Id == item.CombinedItemId);
 
             var quantity = item.Height / originalItem.Height;
             originalItem.Quantity += (int)quantity;
@@ -101,7 +100,7 @@ public static class GeneticPackingSolver
             {
                 var newItem = originalItem with
                 {
-                    ID = originalItem.ID,
+                    Id = originalItem.Id,
                     Quantity = 1,
                     Height = originalItem.Height,
                     CoordX = item.CoordX,
@@ -121,7 +120,7 @@ public static class GeneticPackingSolver
         foreach (var item in unpackedGrouped)
         {
             var originalItem = originalItems
-                .First(r => r.ID == item.CombinedItemId);
+                .First(r => r.Id == item.CombinedItemId);
 
             var quantity = item.Height / originalItem.Height;
             originalItem.Quantity += (int)quantity;
@@ -132,7 +131,7 @@ public static class GeneticPackingSolver
             {
                 var newItem = originalItem with
                 {
-                    ID = originalItem.ID,
+                    Id = originalItem.Id,
                     Quantity = 1,
                     Height = originalItem.Height,
                     CoordX = item.CoordX,
@@ -179,11 +178,11 @@ public static class GeneticPackingSolver
                     var smallId = Guid.NewGuid();
                     items.Add(item with
                     {
-                        ID = smallId,
+                        Id = smallId,
                         IsCombined = true,
                         Height = item.Height * item.Quantity,
                         Weight = item.Weight * item.Quantity,
-                        CombinedItemId = item.ID,
+                        CombinedItemId = item.Id,
                         IsStackable = false,
                         Quantity = 1,
                     });
@@ -193,11 +192,11 @@ public static class GeneticPackingSolver
                 {
                     items.Add(item with
                     {
-                        ID = newId,
+                        Id = newId,
                         IsCombined = true,
                         Height = item.Height * maxStack,
                         Weight = item.Weight * maxStack,
-                        CombinedItemId = item.ID,
+                        CombinedItemId = item.Id,
                         IsStackable = false,
                         Quantity = 1,
                     });
@@ -206,7 +205,7 @@ public static class GeneticPackingSolver
             }
         }
         return items
-            .GroupBy(r => r.ID)
+            .GroupBy(r => r.Id)
             .Select(r => r.First() with
             {
                 Quantity = r.Sum(x => x.Quantity)
@@ -214,7 +213,7 @@ public static class GeneticPackingSolver
             .Where(r => r.Quantity > 0).ToList();
     }
 
-    private static AlgorithmPackingResult PackForContainer(
+    private static PackingResult PackForContainer(
         Container container,
         IReadOnlyCollection<Item> itemsToPack,
         decimal dim,
@@ -222,7 +221,7 @@ public static class GeneticPackingSolver
     {
         var items = itemsToPack.Select(r => r with {}).ToList();
         var currentX = 0M;
-        var result = new AlgorithmPackingResult
+        var result = new PackingResult
         {
             Container = container,
             PackedItems = [],
@@ -240,7 +239,7 @@ public static class GeneticPackingSolver
         foreach (var packedItem in firstPack.PackedItems)
         {
             packedItem.CoordX += currentX;
-            var item = result.UnpackedItems.FirstOrDefault(r => r.ID == packedItem.ID);
+            var item = result.UnpackedItems.FirstOrDefault(r => r.Id == packedItem.Id);
             if (item == null) continue;
             item.Quantity -= 1;
             if (item.Quantity <= 0)
@@ -261,8 +260,8 @@ public static class GeneticPackingSolver
         Container trailer,
         decimal[] dims,
         decimal currentX,
-        AlgorithmPackingResult result,
-        AlgorithmPackingResult previousPack)
+        PackingResult result,
+        PackingResult previousPack)
     {
         if (result.TotalWeightPacked >= trailer.MaxWeight)
         {
@@ -281,7 +280,7 @@ public static class GeneticPackingSolver
         if (remainingLength <= 0) return;
 
         var matchingNextPack = PreviousPackLeft(previousPack);
-        AlgorithmPackingResult bestResult;
+        PackingResult bestResult;
         
         if (matchingNextPack != null &&
             previousPack.PackedItems.Select(r => r.PackDimX).Max() <= remainingLength)
@@ -302,7 +301,7 @@ public static class GeneticPackingSolver
         {
             var newItem = packedItem with {};
             newItem.CoordX += currentX;
-            var item = result.UnpackedItems.FirstOrDefault(r => r.ID == newItem.ID);
+            var item = result.UnpackedItems.FirstOrDefault(r => r.Id == newItem.Id);
             if (item == null) continue;
             item.Quantity -= 1;
             if (item.Quantity <= 0)
@@ -314,13 +313,13 @@ public static class GeneticPackingSolver
         RecursivelyPackItems(trailer, dims, currentX, result, bestResult);
     }
 
-    private static void OptimizeResult(AlgorithmPackingResult result)
+    private static void OptimizeResult(PackingResult result)
     {
         RearrangeLayers(result);
         DropFloatingItems(result);
     }
 
-    private static void RearrangeLayers(AlgorithmPackingResult result)
+    private static void RearrangeLayers(PackingResult result)
     {
         if (result.PackedItems.Select(r => r.Height).DistinctWithTolerance(0.1M).Count() == 1) return;
         var layers = result.PackedItems
@@ -346,7 +345,7 @@ public static class GeneticPackingSolver
         result.PackedItems = items;
     }
 
-    private static void DropFloatingItems(AlgorithmPackingResult result)
+    private static void DropFloatingItems(PackingResult result)
     {
         foreach (var item in result.PackedItems)
         {
@@ -369,13 +368,13 @@ public static class GeneticPackingSolver
         }
     }
 
-    private static AlgorithmPackingResult CalculateBestResult(
+    private static PackingResult CalculateBestResult(
         decimal[] dims,
         decimal remainingLength,
         Container trailer,
         List<Item> itemsToPack)
     {
-        var results = new List<AlgorithmPackingResult>();
+        var results = new List<PackingResult>();
         foreach (var proposedDim in dims)
         {
             if (proposedDim > remainingLength) continue;
@@ -394,7 +393,7 @@ public static class GeneticPackingSolver
             .First();
     }
     
-    private static AlgorithmPackingResult PreviousPackLeft(AlgorithmPackingResult previousPack)
+    private static PackingResult PreviousPackLeft(PackingResult previousPack)
     {
         var nextResult = previousPack with
         {
@@ -402,7 +401,7 @@ public static class GeneticPackingSolver
         };
         foreach (var packedItem in previousPack.PackedItems)
         {
-            var item = previousPack.UnpackedItems.FirstOrDefault(r => r.ID == packedItem.ID);
+            var item = previousPack.UnpackedItems.FirstOrDefault(r => r.Id == packedItem.Id);
             if (item == null)
             {
                 item = previousPack.UnpackedItems
@@ -415,7 +414,7 @@ public static class GeneticPackingSolver
 
             var newItem = packedItem with
             {
-                ID = item.ID,
+                Id = item.Id,
             };
             nextResult.PackedItems.Add(newItem);
             nextResult.UnpackedItems.Remove(item);

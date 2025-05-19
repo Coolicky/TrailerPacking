@@ -10,6 +10,7 @@ namespace Coolicky.TrailerPacking.Algorithms;
 /// which itself was a JavaScript port of https://github.com/wknechtel/3d-bin-pack/, which is a C reconstruction 
 /// of a novel algorithm developed in a U.S. Air Force master's thesis by Erhan Baltacioglu in 2001.
 /// </summary>
+// ReSharper disable once InconsistentNaming
 public class EB_AFIT : IPackingAlgorithm
 {
 	/// <summary>
@@ -18,7 +19,7 @@ public class EB_AFIT : IPackingAlgorithm
 	/// <param name="trailer">The container to pack items into.</param>
 	/// <param name="items">The items to pack.</param>
 	/// <returns>The bin packing result.</returns>
-	public AlgorithmPackingResult Run(Container trailer, List<Item> items)
+	public PackingResult Run(Container trailer, List<Item> items)
 	{
 		container = trailer; 
 
@@ -26,10 +27,8 @@ public class EB_AFIT : IPackingAlgorithm
 		ExecuteIterations();
 		Report();
 
-		var algoResult = new AlgorithmPackingResult();
+		var algoResult = new PackingResult();
 		algoResult.Container = container;
-		algoResult.AlgorithmID = (int)AlgorithmType.EB_AFIT;
-		algoResult.AlgorithmName = "EB-AFIT";
 
 		for (var i = 1; i <= itemsToPackCount; i++)
 		{
