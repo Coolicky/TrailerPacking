@@ -1,4 +1,4 @@
-using Coolicky.TrailerPacking.Entities;
+using Coolicky.ContainerPacking.Entities;
 
 namespace Coolicky.ContainerPacking.Api.Dtos;
 

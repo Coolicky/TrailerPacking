@@ -1,5 +1,5 @@
-﻿using Coolicky.TrailerPacking.DemoApp.Models;
-using Coolicky.TrailerPacking.Entities;
+﻿using Coolicky.ContainerPacking.DemoApp.Models;
+using Coolicky.ContainerPacking.Entities;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using System;

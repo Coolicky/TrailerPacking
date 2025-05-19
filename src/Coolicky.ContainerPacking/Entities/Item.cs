@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Coolicky.TrailerPacking.Entities;
+namespace Coolicky.ContainerPacking.Entities;
 
 /// <summary>
 /// Represents an item to be packed, containing its dimensions, weight, stackability, and other attributes

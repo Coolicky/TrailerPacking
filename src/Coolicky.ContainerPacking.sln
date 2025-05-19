@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coolicky.TrailerPacking", "Coolicky.TrailerPacking\Coolicky.TrailerPacking.csproj", "{49D6AD56-1545-4864-AC6E-80A8922742DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coolicky.ContainerPacking", "Coolicky.ContainerPacking\Coolicky.ContainerPacking.csproj", "{49D6AD56-1545-4864-AC6E-80A8922742DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coolicky.TrailerPacking.DemoApp", "Coolicky.TrailerPacking.DemoApp\Coolicky.TrailerPacking.DemoApp.csproj", "{EB1D3F02-BC70-41B6-A9E0-DD00B3266419}"
 EndProject

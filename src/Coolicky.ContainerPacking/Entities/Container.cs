@@ -1,4 +1,4 @@
-﻿namespace Coolicky.TrailerPacking.Entities;
+﻿namespace Coolicky.ContainerPacking.Entities;
 
 /// <summary>
 /// Represents a container with defined dimensions and weight capacity.

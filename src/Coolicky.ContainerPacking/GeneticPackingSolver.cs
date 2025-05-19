@@ -1,12 +1,12 @@
-﻿using Coolicky.TrailerPacking.Algorithms;
-using Coolicky.TrailerPacking.Entities;
+﻿using Coolicky.ContainerPacking.Algorithms;
+using Coolicky.ContainerPacking.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Coolicky.TrailerPacking;
+namespace Coolicky.ContainerPacking;
 
 public interface IPackingSolver
 {

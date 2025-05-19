@@ -1,6 +1,6 @@
-﻿using Coolicky.TrailerPacking.Entities;
+﻿using Coolicky.ContainerPacking.Entities;
 
-namespace Coolicky.TrailerPacking;
+namespace Coolicky.ContainerPacking;
 
 /// <summary>
 /// Represents a set of coordinates that define the bounding box of an item in 3D space.

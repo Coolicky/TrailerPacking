@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Coolicky.TrailerPacking\Coolicky.TrailerPacking.csproj" />
+      <ProjectReference Include="..\Coolicky.ContainerPacking\Coolicky.ContainerPacking.csproj" />
     </ItemGroup>
 
 </Project>

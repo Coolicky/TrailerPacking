@@ -1,9 +1,9 @@
-﻿using Coolicky.TrailerPacking.Entities;
+﻿using Coolicky.ContainerPacking.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Coolicky.TrailerPacking.Algorithms;
+namespace Coolicky.ContainerPacking.Algorithms;
 
 /// <summary>
 /// A 3D bin packing algorithm originally ported from https://github.com/keremdemirer/3dbinpackingjs,

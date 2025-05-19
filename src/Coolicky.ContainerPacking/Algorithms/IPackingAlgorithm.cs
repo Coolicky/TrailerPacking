@@ -1,7 +1,7 @@
-﻿using Coolicky.TrailerPacking.Entities;
+﻿using Coolicky.ContainerPacking.Entities;
 using System.Collections.Generic;
 
-namespace Coolicky.TrailerPacking.Algorithms;
+namespace Coolicky.ContainerPacking.Algorithms;
 
 /// <summary>
 /// Represents an interface for implementing packing algorithms that determine how to efficiently pack items into a container.

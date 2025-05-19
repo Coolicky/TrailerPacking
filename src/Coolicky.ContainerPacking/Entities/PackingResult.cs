@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Coolicky.TrailerPacking.Entities;
+namespace Coolicky.ContainerPacking.Entities;
 
 /// <summary>
 /// Represents the result of a packing operation, including details about packed and unpacked items,

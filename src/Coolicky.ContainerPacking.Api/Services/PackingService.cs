@@ -1,5 +1,5 @@
 using Coolicky.ContainerPacking.Api.Dtos;
-using Coolicky.TrailerPacking.Algorithms;
+using Coolicky.ContainerPacking.Algorithms;
 
 namespace Coolicky.ContainerPacking.Api.Services;
 

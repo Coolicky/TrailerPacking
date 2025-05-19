@@ -1,6 +1,6 @@
 using Coolicky.ContainerPacking.Api.Services;
-using Coolicky.TrailerPacking;
-using Coolicky.TrailerPacking.Algorithms;
+using Coolicky.ContainerPacking;
+using Coolicky.ContainerPacking.Algorithms;
 using FastEndpoints;
 
 var builder = WebApplication.CreateBuilder(args);

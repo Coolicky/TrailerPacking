@@ -1,4 +1,4 @@
-﻿using Coolicky.TrailerPacking.Entities;
+﻿using Coolicky.ContainerPacking.Entities;
 using System.Collections.Generic;
 
 namespace Coolicky.TrailerPacking.DemoApp.Models
