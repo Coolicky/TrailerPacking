@@ -1,0 +1,7 @@
+﻿services:
+  coolicky.containerpacking.api:
+    image: coolicky.containerpacking.api
+    build:
+      context: .
+      dockerfile: Coolicky.ContainerPacking.Api/Dockerfile
+
